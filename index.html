@@ -1,896 +1,823 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>冬の東北：雪之行</title>
-  <meta name="description" content="2025 日本東北冬季旅遊手冊">
-  <meta name="theme-color" content="#FFFEFA">
+import React, { useState, useEffect } from 'react';
+import { 
+  Plane, 
+  MapPin, 
+  Utensils, 
+  BedDouble, 
+  Camera, 
+  ShoppingBag, 
+  Info, 
+  Phone, 
+  CloudSnow, 
+  CloudRain, 
+  Sun,
+  ChevronDown,
+  CheckSquare,
+  Plus,
+  Trash2,
+  Navigation,
+  Train,
+  Gift,
+  AlertCircle,
+  Briefcase,
+  MessageCircle,
+  ShoppingCart,
+  Mic,
+  BookOpen,
+  Store,
+  MapPinned, 
+  ExternalLink,
+  Search,
+  Star // New icon for recommendations
+} from 'lucide-react';
+
+// --- Data & Configuration ---
+
+const itineraryData = [
+  {
+    day: 1,
+    date: "12/6 (六)",
+    location: "仙台",
+    weather: "cloudy", 
+    temp: "2°C",
+    tag: "出發",
+    hotel: "Hotel View Kuroda 天童黑田飯店",
+    hotelTel: "+81-23-654-1515",
+    conbini: {
+      stores: [
+        { name: "Daily Yamazaki", type: "daily", dist: "3 min" },
+        { name: "7-Eleven", type: "711", dist: "5 min" }
+      ],
+      searchQuery: "convenience store near Hotel View Kuroda Tendo",
+      link: "https://www.google.com/maps/search/convenience+store+near+Hotel+View+Kuroda+Tendo"
+    },
+    intro: "旅程的起點。飛往北國雪境，晚間享用迎賓會席料理。",
+    recommends: {
+      eat: [
+        { name: "毛豆奶昔 (Zunda Shake)", desc: "仙台名物，香甜濃郁的毛豆泥風味，機場就喝得到！" },
+        { name: "牛舌便當", desc: "若晚餐沒吃飽，車站買個加熱式牛舌便當當宵夜。" }
+      ],
+      buy: [
+        { name: "萩之月 (Hagi no Tsuki)", desc: "仙台國寶級伴手禮，卡士達醬海綿蛋糕。" },
+        { name: "竹葉魚板 (Sasakamaboko)", desc: "仙台特產，口感Q彈，適合當下酒菜。" }
+      ]
+    },
+    activities: [
+      { time: "09:20", type: "transport", title: "桃園機場集合", desc: "請至第一航廈「星宇航空」6號團體櫃台找導遊周薇小姐報到。", important: "護照帶了嗎？行動電源請放隨身行李喔！", guide: "出發前的小提醒：日本東北室內暖氣很強，建議「洋蔥式穿搭」，裡面不要穿太厚的高領，以免在室內熱到流汗喔。" },
+      { time: "11:50", type: "flight", title: "星宇航空 JX862", desc: "飛行時間約 3小時10分。", subtext: "機上套餐", guide: "星宇航空的機上特調「湛藍宇宙」別忘了點！這段航程若天氣好，下降前有機會從左側窗戶看到藏王連峰的雪景。" },
+      { time: "16:00", type: "arrival", title: "抵達仙台機場", desc: "正式踏入東北門戶。", guide: "仙台機場是日本東北大地震後重建的重要象徵。一出海關就能感受到空氣中的凜冽，深呼吸一口東北的純淨冷空氣吧！" },
+      { time: "18:30", type: "food", title: "迎賓會席料理", desc: "飯店內享用傳統日式會席。", tag: "文化體驗", guide: "會席料理的順序通常是先冷食（生魚片、前菜）後熱食（烤物、鍋物）。穿著浴衣用餐時，記得「左襟在在」是生人的穿法，別穿反囉！" }
+    ]
+  },
+  {
+    day: 2,
+    date: "12/7 (日)",
+    location: "山形/福島",
+    weather: "snow",
+    temp: "-2°C",
+    tag: "浪漫",
+    hotel: "Listel Inawashiro Hotel 豬苗代",
+    hotelTel: "+81-24-266-2233",
+    conbini: {
+      stores: [
+        { name: "Hotel Shop", type: "shop", dist: "1F" }
+      ],
+      warning: "最近超商需車程 10 分鐘",
+      searchQuery: "convenience store near Listel Inawashiro Hotel",
+      link: "https://www.google.com/maps/search/convenience+store+near+Listel+Inawashiro+Hotel"
+    }, 
+    intro: "大正浪漫的銀山溫泉，彷彿穿越時空進入神隱少女的世界。",
+    recommends: {
+      eat: [
+        { name: "咖哩麵包 (Haikara-san)", desc: "銀山溫泉必吃！酥脆外皮配上微辣咖哩內餡。" },
+        { name: "手工豆腐 (Nogawa)", desc: "百年老店，在雪中站著吃熱騰騰的湯豆腐最棒。" }
+      ],
+      buy: [
+        { name: "山形櫻桃果凍", desc: "山形縣是櫻桃王國，果凍內有整顆櫻桃。" },
+        { name: "樹冰羅曼史", desc: "藏王樹冰限定餅乾，酥脆好吃。" }
+      ]
+    },
+    activities: [
+      { time: "上午", type: "sightseeing", title: "銀山溫泉街", desc: "大正浪漫氛圍，木造建築覆蓋著白雪。", highlight: "神隱少女場景", tips: "必吃：入口處的「Haikara-san」咖哩麵包", guide: "這裡以前是銀礦產地，所以叫銀山。兩旁能登屋等旅館的木造建築，保留了大正時代受到西洋影響的風格。紅色的小橋是最佳拍照點，如果運氣好遇到飄雪，真的美到像在做夢！" },
+      { time: "午餐", type: "food", title: "山形牛鍋御膳", desc: "油脂豐富的黑毛和牛壽喜燒。", tag: "極品美食", guide: "山形牛的特點是脂肪細緻甘甜。在日本吃壽喜燒，通常會把肉沾著生蛋液吃，能降低溫度並增加滑順口感，不敢吃生蛋的可以把蛋加進鍋裡煮熟。" },
+      { time: "下午", type: "sightseeing", title: "上杉神社", desc: "祭祀戰國軍神「上杉謙信」。", guide: "這裡是歷史迷的聖地！上杉謙信被稱為「越後之龍」，這裡祈求「勝運」非常靈驗。寶物殿裡還收藏著著名的「毘」字軍旗喔。" },
+      { time: "下午", type: "sightseeing", title: "豬苗代湖", desc: "冬季天鵝飛來地，映照磐梯山。", guide: "豬苗代湖因為水質清澈，被稱為「天鏡湖」。每年冬天會有數千隻西伯利亞飛來的天鵝在此過冬。背景的磐梯山有「會津富士」的美稱，是福島的精神象徵。" },
+      { time: "晚餐", type: "food", title: "時令精選自助餐", desc: "飯店內享用。" }
+    ]
+  },
+  {
+    day: 3,
+    date: "12/8 (一)",
+    location: "會津若松",
+    weather: "snow",
+    temp: "-3°C",
+    tag: "歷史",
+    hotel: "Listel Inawashiro Hotel 豬苗代",
+    hotelTel: "+81-24-266-2233",
+    conbini: {
+      stores: [{ name: "Hotel Shop", type: "shop", dist: "1F" }],
+      warning: "最近超商需車程 10 分鐘",
+      searchQuery: "convenience store near Listel Inawashiro Hotel",
+      link: "https://www.google.com/maps/search/convenience+store+near+Listel+Inawashiro+Hotel"
+    },
+    intro: "探訪歷史名城與傳統茅屋聚落，體驗獨特的大蔥蕎麥麵。",
+    recommends: {
+      eat: [
+        { name: "大蔥蕎麥麵 (Negi Soba)", desc: "大內宿名物，用蔥當筷子，蔥也能咬著吃！" },
+        { name: "醬汁豬排丼", desc: "會津若松的靈魂美食，鹹甜醬汁超下飯。" }
+      ],
+      buy: [
+        { name: "赤貝古 (Akabeko)", desc: "會津的紅色搖頭牛玩具，象徵除厄開運。" },
+        { name: "會津塗漆器", desc: "傳統工藝品，買雙筷子或湯碗很實用。" }
+      ]
+    },
+    activities: [
+      { time: "上午", type: "activity", title: "雪中採草莓", desc: "溫室採摘，30分鐘吃到飽。", tag: "當季", guide: "日本草莓不需清洗可以直接吃！東北日夜溫差大，草莓特別甜。記得從蒂頭拔起後，從尾端（尖的那頭）開始吃會感覺比較甜喔！" },
+      { time: "午餐", type: "food", title: "會津日式定食", desc: "在地鄉土風味。", guide: "會津地區的飲食文化深受武家社會影響，口味樸實而深厚。這裡的味噌料理很有名。" },
+      { time: "下午", type: "sightseeing", title: "會津若松城 (鶴之城)", desc: "日本百大名城，全日本唯一的紅瓦天守閣。", guide: "這裡見證了幕末「白虎隊」的悲劇歷史。紅瓦設計是為了防止瓦片被冬天的雪凍裂。在白雪覆蓋下，紅瓦白牆的對比非常震撼。" },
+      { time: "下午", type: "sightseeing", title: "大內宿", desc: "江戶時代宿場町，茅草屋聚落。", highlight: "大蔥蕎麥麵", tips: "用整根蔥當筷子吃麵！", guide: "這裡是江戶時代連接會津與日光的驛站。必吃的「高遠蕎麥麵」會附上一整根大蔥，你要用蔥撈麵吃，還可以咬一口蔥配麵，嗆辣口感非常過癮！" },
+      { time: "晚餐", type: "food", title: "時令精選自助餐", desc: "飯店內享用。" }
+    ]
+  },
+  {
+    day: 4,
+    date: "12/9 (二)",
+    location: "仙台",
+    weather: "cloudy", 
+    temp: "1°C",
+    tag: "都會",
+    hotel: "Hotel Keihan Sendai 京阪仙台",
+    hotelTel: "022-263-0321",
+    conbini: {
+      stores: [
+        { name: "FamilyMart", type: "family", dist: "2 min" },
+        { name: "7-Eleven", type: "711", dist: "3 min" }
+      ],
+      searchQuery: "convenience store near Hotel Keihan Sendai",
+      link: "https://www.google.com/maps/search/convenience+store+near+Hotel+Keihan+Sendai"
+    },
+    intro: "深入地底探險，回到現代都會。晚上的自由時間是購物重頭戲！",
+    recommends: {
+      eat: [
+        { name: "炭烤牛舌 (利久/善治郎)", desc: "仙台必吃！厚切口感脆彈，配麥飯和牛尾湯。" },
+        { name: "鯛魚燒 (阿部蒲鉾店)", desc: "名物「炸葫蘆」(Hyotan Age) 其實是魚漿熱狗！" }
+      ],
+      buy: [
+        { name: "喜久福 (Kikufuku)", desc: "咒術迴戰五條悟推薦！鮮奶油大福。" },
+        { name: "Press Butter Sand", desc: "東北限定口味（如毛豆），送禮超體面。" }
+      ]
+    },
+    activities: [
+      { time: "上午", type: "sightseeing", title: "阿武隈洞", desc: "8000萬年形成的鐘乳石洞。", tips: "階梯多，請穿好走的鞋", guide: "洞內像是異世界一樣！最著名的景點是「聖誕樹」和「樹冰」，這是地下水經過數千萬年滴落累積而成的藝術品。洞內恆溫約15度，冬暖夏涼。" },
+      { time: "下午", type: "sightseeing", title: "仙台海洋森林水族館", desc: "東北最大水族館。", guide: "別錯過大水槽的「沙丁魚龍捲風」表演，配合聲光效果非常壯觀！這裡也展示了三陸海岸豐富的海洋生態。" },
+      { time: "傍晚", type: "shopping", title: "仙台一番街 自由活動", desc: "藥妝、百貨、美食攻略。", highlight: "牛舌/毛豆奶昔", tips: "必買伴手禮：萩之月", guide: "【導遊攻略】晚餐推薦去吃「利久」或「善治郎」的炭烤牛舌定食，厚切口感脆彈！甜點一定要喝「Zunda Saryo」的毛豆奶昔，這是仙台才有的味道。藥妝店可以去SunDrug或松本清比價。" }
+    ]
+  },
+  {
+    day: 5,
+    date: "12/10 (三)",
+    location: "松島",
+    weather: "sun",
+    temp: "3°C",
+    tag: "歸途",
+    hotel: "溫暖的家",
+    intro: "旅程最終章，在松島留下美好回憶，帶著滿滿戰利品回家。",
+    recommends: {
+      eat: [
+        { name: "現烤牡蠣", desc: "松島牡蠣肥美多汁，路邊就有得買！" },
+        { name: "手烤魚板體驗", desc: "自己烤的魚板特別香，現烤現吃。" }
+      ],
+      buy: [
+        { name: "AEON 超市零食", desc: "最後機會！把日幣零錢全部換成餅乾糖果。" },
+        { name: "仙台味噌", desc: "風味濃郁，回家煮湯就能重溫日本味。" }
+      ]
+    },
+    activities: [
+      { time: "上午", type: "sightseeing", title: "松島遊船", desc: "搭船巡遊松島灣。", tag: "日本三景", guide: "俳句詩人松尾芭蕉曾讚嘆松島之美。松島灣內有260多個島嶼，可以試著找找看最像「仁王像」的仁王島。記得，船上禁止餵食海鷗喔！" },
+      { time: "上午", type: "sightseeing", title: "五大堂", desc: "結緣橋與國家重要文化財產。", guide: "連結小島的紅橋板子間有空隙，可以直接看到下面的海，這叫「透橋」，目的是讓你過橋時要戰戰兢兢、集中精神，也是考驗想去參拜的人的誠心。" },
+      { time: "午餐", type: "shopping", title: "AEON MALL", desc: "午餐自理，最後衝刺購物。", tips: "把零錢花完的好地方", guide: "這是東北最大的AEON，裡面有超市、Uniqlo、百元店Seria。建議先去超市買些日本零食、泡麵帶回去送人，CP值最高！" },
+      { time: "17:15", type: "flight", title: "星宇航空 JX863", desc: "返回桃園機場 (20:35抵達)", guide: "回程記得再次檢查行李重量，鋰電池（行動電源）一定要在隨身行李，不能託運喔！大家辛苦了，期待下次再見！" }
+    ]
+  }
+];
+
+// --- Components ---
+
+const Snowfall = () => (
+  <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-40" aria-hidden="true">
+    {[...Array(30)].map((_, i) => (
+      <div
+        key={i}
+        className="absolute bg-white rounded-full animate-fall"
+        style={{
+          left: `${Math.random() * 100}%`,
+          top: `-${Math.random() * 20}%`,
+          width: `${Math.random() * 6 + 2}px`,
+          height: `${Math.random() * 6 + 2}px`,
+          animationDuration: `${Math.random() * 5 + 8}s`,
+          animationDelay: `${Math.random() * 5}s`
+        }}
+      />
+    ))}
+  </div>
+);
+
+const WeatherBadge = ({ type, temp, location }) => {
+  let Icon = CloudSnow;
+  if (type === 'sun') Icon = Sun;
+  if (type === 'cloudy') Icon = CloudRain;
   
-  <!-- PWA Icons -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❄️</text></svg>">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23D32F2F%22/><text x=%2250%22 y=%2250%22 font-size=%2250%22 text-anchor=%22middle%22 dy=%22.35em%22>東北</text></svg>">
+  return (
+    <div className="flex flex-col items-center justify-center p-3 bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-[#F0E0E0] min-w-[70px] animate-fadeIn">
+      <span className="text-[10px] font-serif font-bold text-slate-400 mb-1 tracking-widest uppercase">{location}</span>
+      <Icon className="w-6 h-6 text-[#D32F2F] mb-1" strokeWidth={1.5} />
+      <span className="text-sm font-serif font-bold text-slate-700">{temp}</span>
+    </div>
+  );
+};
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+const GuideCard = ({ text }) => (
+  <div className="bg-[#FFF8E1]/60 p-4 rounded-xl border border-[#FFE0B2] flex gap-4 shadow-sm mt-4 relative">
+    <div className="absolute -top-3 -left-2 bg-[#FFB74D] text-white p-1.5 rounded-full shadow-md">
+      <Mic size={14} />
+    </div>
+    <div className="text-sm text-[#5D4037] leading-loose text-justify font-serif">
+      <span className="font-bold block mb-1 text-[#E65100] text-xs tracking-widest">GUIDE'S NOTE</span>
+      {text}
+    </div>
+  </div>
+);
 
-  <!-- React & ReactDOM & Babel -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- Lucide Icons (Global) -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+const ConbiniMapCard = ({ conbini }) => {
+  const getPinColor = (type) => {
+    if (type === '711') return "text-[#EA5404]"; 
+    if (type === 'family' || type === 'lawson') return "text-[#0091DA]"; 
+    if (type === 'daily') return "text-[#D9232A]"; 
+    return "text-slate-500"; 
+  };
 
-  <style>
-    /* Custom Styles */
-    body { background-color: #FFFEFA; }
-    .font-serif { font-family: 'Shippori Mincho', 'Noto Serif TC', serif; }
-    .font-sans { font-family: sans-serif; }
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-    
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .animate-slideUp { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    
-    @keyframes fall { 0% { transform: translateY(-10vh) translateX(0); } 100% { transform: translateY(100vh) translateX(20px); } }
-    .animate-fall { animation-timing-function: linear; animation-iteration-count: infinite; }
-    
-    .tool-tab { display:flex; align-items:center; gap:8px; padding:10px 20px; font-size:12px; font-weight:bold; letter-spacing: 0.05em; white-space:nowrap; transition:all 0.3s; background:transparent; color:#94a3b8; border-bottom:2px solid transparent; font-family: 'Noto Serif TC', serif; }
-    .tool-tab.active { color:#D32F2F; border-color:#D32F2F; }
-    
-    .pt-safe-top { padding-top: env(safe-area-inset-top, 20px); }
-    .pb-safe-bottom { padding-bottom: env(safe-area-inset-bottom, 20px); }
-  </style>
-</head>
-<body>
-  <div id="root"></div>
-
-  <script type="text/babel">
-    const { useState, useEffect } = React;
-    
-    // Lucide Icons Component Wrapper for React
-    const Icon = ({ name, size = 24, color = "currentColor", className = "", ...props }) => {
-      const LucideIcons = window.lucide.icons;
-      const IconComponent = LucideIcons[name];
-      
-      useEffect(() => {
-        window.lucide.createIcons();
-      }, [name]);
-
-      if (!IconComponent) return null;
-      
-      // We need to convert the vanilla SVG string or element to React.
-      // Since standard lucide package is vanilla, for this standalone HTML we use a simple mapping
-      // Or better, we use the lucide-react UMD if available, but it's tricky.
-      // Workaround: We map specific icon names to SVGs or use a dirty trick to render.
-      // ACTUALLY, for simplicity in this single file without build step, let's implement a simple SVG renderer for the icons we use
-      // OR use a CDN that provides React components directly.
-      
-      return <i data-lucide={name} className={className} style={{ width: size, height: size, color: color, display: 'inline-block' }}></i>;
-    };
-
-    // Since data-lucide needs re-render, let's use a specialized component that calls createIcons
-    const LucideIcon = ({ name, size=20, className="", strokeWidth=2 }) => {
-       const ref = React.useRef(null);
-       useEffect(() => {
-         if(ref.current) {
-            ref.current.innerHTML = ''; // Clear
-            const i = document.createElement('i');
-            i.setAttribute('data-lucide', name);
-            // Apply styles manually as Lucide reads them
-            i.style.width = size + 'px';
-            i.style.height = size + 'px';
-            ref.current.appendChild(i);
-            window.lucide.createIcons({
-              root: ref.current,
-              attrs: {
-                width: size,
-                height: size,
-                'stroke-width': strokeWidth,
-                class: className
-              }
-            });
-         }
-       }, [name, size, className, strokeWidth]);
-       return <span ref={ref} style={{display:'inline-flex', verticalAlign:'middle'}} />;
-    };
-
-    // --- Helper for AI Images ---
-    const getImg = (keyword, width = 800, height = 500) => 
-      `https://image.pollinations.ai/prompt/${encodeURIComponent(keyword)}?width=${width}&height=${height}&nologo=true&seed=${Math.random()}`;
-
-    // --- Data ---
-    const itineraryData = [
-      {
-        day: 1,
-        date: "12/6 (六)",
-        location: "仙台",
-        weather: "cloudy", 
-        temp: "2°C",
-        tag: "出發",
-        hotel: "Hotel View Kuroda 天童黑田飯店",
-        hotelTel: "+81-23-654-1515",
-        heroImage: getImg("Sendai city winter night street japan", 1000, 600),
-        conbini: {
-          stores: [
-            { name: "Daily Yamazaki", type: "daily", dist: "3 min" },
-            { name: "7-Eleven", type: "711", dist: "5 min" }
-          ],
-          searchQuery: "convenience store near Hotel View Kuroda Tendo",
-          link: "https://www.google.com/maps/search/convenience+store+near+Hotel+View+Kuroda+Tendo"
-        },
-        intro: "旅程的起點。飛往北國雪境，晚間享用迎賓會席料理。",
-        recommends: {
-          eat: [
-            { name: "毛豆奶昔", desc: "Zunda Shake", image: getImg("Zunda Shake green edamame milkshake cup", 300, 300) },
-            { name: "牛舌便當", desc: "厚切炭烤", image: getImg("Grilled Beef Tongue Bento Box Gyutan", 300, 300) }
-          ],
-          buy: [
-            { name: "萩之月", desc: "仙台銘菓", image: getImg("Hagi no Tsuki yellow sponge cake custard", 300, 300) },
-            { name: "竹葉魚板", desc: "Sasa Kamaboko", image: getImg("Sasakamaboko fish cake leaf shape", 300, 300) }
-          ]
-        },
-        activities: [
-          { time: "09:20", type: "transport", title: "桃園機場集合", desc: "請至第一航廈「星宇航空」6號團體櫃台找導遊周薇小姐報到。", important: "護照帶了嗎？行動電源請放隨身行李喔！", guide: "出發前的小提醒：日本東北室內暖氣很強，建議「洋蔥式穿搭」，裡面不要穿太厚的高領，以免在室內熱到流汗喔。" },
-          { time: "11:50", type: "flight", title: "星宇航空 JX862", desc: "飛行時間約 3小時10分。", subtext: "機上套餐", guide: "星宇航空的機上特調「湛藍宇宙」別忘了點！這段航程若天氣好，下降前有機會從左側窗戶看到藏王連峰的雪景。" },
-          { time: "16:00", type: "arrival", title: "抵達仙台機場", desc: "正式踏入東北門戶。", guide: "仙台機場是日本東北大地震後重建的重要象徵。一出海關就能感受到空氣中的凜冽，深呼吸一口東北的純淨冷空氣吧！" },
-          { time: "18:30", type: "food", title: "迎賓會席料理", desc: "飯店內享用傳統日式會席。", tag: "文化體驗", guide: "會席料理的順序通常是先冷食（生魚片、前菜）後熱食（烤物、鍋物）。穿著浴衣用餐時，記得「左襟在在」是生人的穿法，別穿反囉！", image: getImg("Japanese Kaiseki ryokan dinner feast", 800, 400) }
-        ]
-      },
-      {
-        day: 2,
-        date: "12/7 (日)",
-        location: "山形/福島",
-        weather: "snow",
-        temp: "-2°C",
-        tag: "浪漫",
-        hotel: "Listel Inawashiro Hotel 豬苗代",
-        hotelTel: "+81-24-266-2233",
-        heroImage: getImg("Ginzan Onsen winter snow night gas lights", 1000, 600),
-        conbini: {
-          stores: [
-            { name: "Hotel Shop", type: "shop", dist: "1F" }
-          ],
-          warning: "最近超商需車程 10 分鐘",
-          searchQuery: "convenience store near Listel Inawashiro Hotel",
-          link: "https://www.google.com/maps/search/convenience+store+near+Listel+Inawashiro+Hotel"
-        }, 
-        intro: "大正浪漫的銀山溫泉，彷彿穿越時空進入神隱少女的世界。",
-        recommends: {
-          eat: [
-            { name: "咖哩麵包", desc: "Haikara-san", image: getImg("Japanese curry bread fried doughnut", 300, 300) },
-            { name: "手工豆腐", desc: "百年老店", image: getImg("Japanese fresh tofu dish", 300, 300) }
-          ],
-          buy: [
-            { name: "櫻桃果凍", desc: "山形特產", image: getImg("Red Cherry Jelly dessert glass", 300, 300) },
-            { name: "樹冰羅曼史", desc: "限定餅乾", image: getImg("White chocolate cookie sandwich souvenir", 300, 300) }
-          ]
-        },
-        activities: [
-          { time: "上午", type: "sightseeing", title: "銀山溫泉街", desc: "大正浪漫氛圍，木造建築覆蓋著白雪。", highlight: "神隱少女場景", tips: "必吃：入口處的「Haikara-san」咖哩麵包", guide: "這裡以前是銀礦產地，所以叫銀山。兩旁能登屋等旅館的木造建築，保留了大正時代受到西洋影響的風格。紅色的小橋是最佳拍照點，如果運氣好遇到飄雪，真的美到像在做夢！", image: getImg("Ginzan Onsen red bridge snow", 800, 400) },
-          { time: "午餐", type: "food", title: "山形牛鍋御膳", desc: "油脂豐富的黑毛和牛壽喜燒。", tag: "極品美食", guide: "山形牛的特點是脂肪細緻甘甜。在日本吃壽喜燒，通常會把肉沾著生蛋液吃，能降低溫度並增加滑順口感，不敢吃生蛋的可以把蛋加進鍋裡煮熟。" },
-          { time: "下午", type: "sightseeing", title: "上杉神社", desc: "祭祀戰國軍神「上杉謙信」。", guide: "這裡是歷史迷的聖地！上杉謙信被稱為「越後之龍」，這裡祈求「勝運」非常靈驗。寶物殿裡還收藏著著名的「毘」字軍旗喔。" },
-          { time: "下午", type: "sightseeing", title: "豬苗代湖", desc: "冬季天鵝飛來地，映照磐梯山。", guide: "豬苗代湖因為水質清澈，被稱為「天鏡湖」。每年冬天會有數千隻西伯利亞飛來的天鵝在此過冬。背景的磐梯山有「會津富士」的美稱，是福島的精神象徵。", image: getImg("Lake Inawashiro winter swans Mount Bandai", 800, 400) },
-          { time: "晚餐", type: "food", title: "時令精選自助餐", desc: "飯店內享用。" }
-        ]
-      },
-      {
-        day: 3,
-        date: "12/8 (一)",
-        location: "會津若松",
-        weather: "snow",
-        temp: "-3°C",
-        tag: "歷史",
-        hotel: "Listel Inawashiro Hotel 豬苗代",
-        hotelTel: "+81-24-266-2233",
-        heroImage: getImg("Tsuruga Castle Aizu Wakamatsu winter snow red roof", 1000, 600),
-        conbini: {
-          stores: [{ name: "Hotel Shop", type: "shop", dist: "1F" }],
-          warning: "最近超商需車程 10 分鐘",
-          searchQuery: "convenience store near Listel Inawashiro Hotel",
-          link: "https://www.google.com/maps/search/convenience+store+near+Listel+Inawashiro+Hotel"
-        },
-        intro: "探訪歷史名城與傳統茅屋聚落，體驗獨特的大蔥蕎麥麵。",
-        recommends: {
-          eat: [
-            { name: "大蔥蕎麥麵", desc: "Negi Soba", image: getImg("Negi Soba noodles whole green onion", 300, 300) },
-            { name: "醬汁豬排丼", desc: "會津靈魂美食", image: getImg("Sauce Katsudon pork cutlet bowl", 300, 300) }
-          ],
-          buy: [
-            { name: "赤貝古", desc: "開運紅牛", image: getImg("Akabeko red cow toy japan", 300, 300) },
-            { name: "會津塗漆器", desc: "傳統工藝", image: getImg("Aizu lacquerware bowl chopsticks", 300, 300) }
-          ]
-        },
-        activities: [
-          { time: "上午", type: "activity", title: "雪中採草莓", desc: "溫室採摘，30分鐘吃到飽。", tag: "當季", guide: "日本草莓不需清洗可以直接吃！東北日夜溫差大，草莓特別甜。記得從蒂頭拔起後，從尾端（尖的那頭）開始吃會感覺比較甜喔！", image: getImg("Strawberry picking greenhouse japan winter", 800, 400) },
-          { time: "午餐", type: "food", title: "會津日式定食", desc: "在地鄉土風味。", guide: "會津地區的飲食文化深受武家社會影響，口味樸實而深厚。這裡的味噌料理很有名。" },
-          { time: "下午", type: "sightseeing", title: "會津若松城", desc: "日本百大名城，全日本唯一的紅瓦天守閣。", guide: "這裡見證了幕末「白虎隊」的悲劇歷史。紅瓦設計是為了防止瓦片被冬天的雪凍裂。在白雪覆蓋下，紅瓦白牆的對比非常震撼。", image: getImg("Tsuruga Castle snow winter close up", 800, 400) },
-          { time: "下午", type: "sightseeing", title: "大內宿", desc: "江戶時代宿場町，茅草屋聚落。", highlight: "大蔥蕎麥麵", tips: "用整根蔥當筷子吃麵！", guide: "這裡是江戶時代連接會津與日光的驛站。必吃的「高遠蕎麥麵」會附上一整根大蔥，你要用蔥撈麵吃，還可以咬一口蔥配麵，嗆辣口感非常過癮！", image: getImg("Ouchijuku thatched roof village snow", 800, 400) },
-          { time: "晚餐", type: "food", title: "時令精選自助餐", desc: "飯店內享用。" }
-        ]
-      },
-      {
-        day: 4,
-        date: "12/9 (二)",
-        location: "仙台",
-        weather: "cloudy", 
-        temp: "1°C",
-        tag: "都會",
-        hotel: "Hotel Keihan Sendai 京阪仙台",
-        hotelTel: "022-263-0321",
-        heroImage: "https://images.unsplash.com/photo-1578256035327-7255534b3739?q=80&w=1000&auto=format&fit=crop",
-        conbini: {
-          stores: [
-            { name: "FamilyMart", type: "family", dist: "2 min" },
-            { name: "7-Eleven", type: "711", dist: "3 min" }
-          ],
-          searchQuery: "convenience store near Hotel Keihan Sendai",
-          link: "https://www.google.com/maps/search/convenience+store+near+Hotel+Keihan+Sendai"
-        },
-        intro: "深入地底探險，回到現代都會。晚上的自由時間是購物重頭戲！",
-        recommends: {
-          eat: [
-            { name: "炭烤牛舌", desc: "厚切口感", image: getImg("Gyutan grilled beef tongue sendai plate", 300, 300) },
-            { name: "炸葫蘆", desc: "魚漿熱狗", image: getImg("Hyotan Age fried fish cake stick", 300, 300) }
-          ],
-          buy: [
-            { name: "喜久福", desc: "鮮奶油大福", image: getImg("Kikufuku daifuku mochi green tea", 300, 300) },
-            { name: "Press Butter Sand", desc: "東北限定", image: getImg("Butter Sand cookie box", 300, 300) }
-          ]
-        },
-        activities: [
-          { time: "上午", type: "sightseeing", title: "阿武隈洞", desc: "8000萬年形成的鐘乳石洞。", tips: "階梯多，請穿好走的鞋", guide: "洞內像是異世界一樣！最著名的景點是「聖誕樹」和「樹冰」，這是地下水經過數千萬年滴落累積而成的藝術品。洞內恆溫約15度，冬暖夏涼。", image: getImg("Abukuma Cave limestone stalactites", 800, 400) },
-          { time: "下午", type: "sightseeing", title: "仙台海洋森林水族館", desc: "東北最大水族館。", guide: "別錯過大水槽的「沙丁魚龍捲風」表演，配合聲光效果非常壯觀！這裡也展示了三陸海岸豐富的海洋生態。", image: getImg("Sendai Umino-Mori Aquarium dolphin show", 800, 400) },
-          { time: "傍晚", type: "shopping", title: "仙台一番街", desc: "自由活動：藥妝、百貨、美食攻略。", highlight: "牛舌/毛豆奶昔", tips: "必買伴手禮：萩之月", guide: "【導遊攻略】晚餐推薦去吃「利久」或「善治郎」的炭烤牛舌定食，厚切口感脆彈！甜點一定要喝「Zunda Saryo」的毛豆奶昔，這是仙台才有的味道。藥妝店可以去SunDrug或松本清比價。", image: getImg("Sendai Ichibancho shopping arcade covered street", 800, 400) }
-        ]
-      },
-      {
-        day: 5,
-        date: "12/10 (三)",
-        location: "松島",
-        weather: "sun",
-        temp: "3°C",
-        tag: "歸途",
-        hotel: "溫暖的家",
-        heroImage: getImg("Matsushima bay islands japan scenic view", 1000, 600),
-        intro: "旅程最終章，在松島留下美好回憶，帶著滿滿戰利品回家。",
-        recommends: {
-          eat: [
-            { name: "現烤牡蠣", desc: "肥美多汁", image: getImg("Grilled Oysters japanese street food", 300, 300) },
-            { name: "手烤魚板", desc: "DIY體驗", image: getImg("Grilled Fish Cake stick japan", 300, 300) }
-          ],
-          buy: [
-            { name: "AEON 超市", desc: "掃貨零食", image: getImg("Japanese supermarket snacks shelves", 300, 300) },
-            { name: "仙台味噌", desc: "風味濃郁", image: getImg("Sendai Miso paste package", 300, 300) }
-          ]
-        },
-        activities: [
-          { time: "上午", type: "sightseeing", title: "松島遊船", desc: "搭船巡遊松島灣。", tag: "日本三景", guide: "俳句詩人松尾芭蕉曾讚嘆松島之美。松島灣內有260多個島嶼，可以試著找找看最像「仁王像」的仁王島。記得，船上禁止餵食海鷗喔！", image: getImg("Matsushima sightseeing boat cruise", 800, 400) },
-          { time: "上午", type: "sightseeing", title: "五大堂", desc: "結緣橋與國家重要文化財產。", guide: "連結小島的紅橋板子間有空隙，可以直接看到下面的海，這叫「透橋」，目的是讓你過橋時要戰戰兢兢、集中精神，也是考驗想去參拜的人的誠心。" },
-          { time: "午餐", type: "shopping", title: "AEON MALL", desc: "午餐自理，最後衝刺購物。", tips: "把零錢花完的好地方", guide: "這是東北最大的AEON，裡面有超市、Uniqlo、百元店Seria。建議先去超市買些日本零食、泡麵帶回去送人，CP值最高！" },
-          { time: "17:15", type: "flight", title: "星宇航空 JX863", desc: "返回桃園機場 (20:35抵達)", guide: "回程記得再次檢查行李重量，鋰電池（行動電源）一定要在隨身行李，不能託運喔！大家辛苦了，期待下次再見！" }
-        ]
-      }
-    ];
-
-    // --- Components ---
-    const Snowfall = () => {
-      const flakes = [...Array(30)].map((_, i) => {
-        const left = Math.random() * 100 + '%';
-        const top = -Math.random() * 20 + '%';
-        const size = Math.random() * 6 + 2 + 'px';
-        const dur = Math.random() * 5 + 8 + 's';
-        const del = Math.random() * 5 + 's';
-        return (
-          <div key={i} className="absolute bg-white rounded-full animate-fall" 
-               style={{left, top, width:size, height:size, animationDuration:dur, animationDelay:del}}></div>
-        )
-      });
-      return <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-40" aria-hidden="true">{flakes}</div>;
-    };
-
-    const WeatherBadge = ({ type, temp, location }) => {
-      let iconName = "cloud-snow";
-      if (type === 'sun') iconName = "sun";
-      if (type === 'cloudy') iconName = "cloud-rain";
-      
-      return (
-        <div className="flex flex-col items-center justify-center p-3 bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-[#F0E0E0] min-w-[70px] animate-fadeIn">
-          <span className="text-[10px] font-serif font-bold text-slate-400 mb-1 tracking-widest uppercase">{location}</span>
-          <LucideIcon name={iconName} size={24} className="text-[#D32F2F] mb-1" strokeWidth={1.5} />
-          <span className="text-sm font-serif font-bold text-slate-700">{temp}</span>
+  return (
+    <a href={conbini.link} target="_blank" rel="noopener noreferrer" className="block group relative w-full h-48 rounded-xl overflow-hidden border border-slate-200 shadow-sm transition-shadow hover:shadow-md mt-4">
+      <div className="absolute inset-0 bg-[#F2F4F6]">
+        <div className="absolute top-0 left-1/3 w-4 h-full bg-white/80 border-x border-slate-200/50 transform -skew-x-12"></div>
+        <div className="absolute top-1/3 left-0 w-full h-4 bg-white/80 border-y border-slate-200/50 transform skew-y-6"></div>
+        <div className="absolute bottom-10 right-0 w-2/3 h-3 bg-white/80 border-y border-slate-200/50"></div>
+        
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+           <div className="relative">
+             <div className="w-4 h-4 bg-blue-500/20 rounded-full animate-ping absolute"></div>
+             <MapPin size={32} className="text-blue-600 fill-white drop-shadow-md" />
+           </div>
         </div>
-      );
-    };
 
-    const GuideCard = ({ text }) => (
-      <div className="bg-[#FFF8E1]/60 p-4 rounded-xl border border-[#FFE0B2] flex gap-4 shadow-sm mt-4 relative">
-        <div className="absolute -top-3 -left-2 bg-[#FFB74D] text-white p-1.5 rounded-full shadow-md">
-          <LucideIcon name="mic" size={14} />
+        {conbini.stores.map((store, idx) => {
+           const positions = [{ top: '20%', left: '20%' }, { top: '30%', left: '80%' }, { top: '70%', left: '30%' }, { top: '60%', left: '70%' }];
+           const pos = positions[idx % positions.length];
+           return (
+             <div key={idx} className="absolute z-0 transform hover:scale-110 transition-transform" style={pos}>
+                <div className="flex flex-col items-center">
+                   <Store size={24} className={`${getPinColor(store.type)} fill-white drop-shadow-sm`} />
+                </div>
+             </div>
+           )
+        })}
+      </div>
+
+      <div className="absolute top-3 left-3 right-3 bg-white/95 backdrop-blur rounded-full px-4 py-2.5 shadow-md border border-slate-100 flex items-center gap-3 z-20">
+         <Search size={16} className="text-slate-400" />
+         <div className="flex-1 truncate text-xs font-bold text-slate-700 font-sans">
+           {conbini.searchQuery || "Convenience store near here"}
+         </div>
+         <div className="bg-slate-100 p-1 rounded-full">
+           <ExternalLink size={12} className="text-slate-400" />
+         </div>
+      </div>
+
+      {conbini.warning && (
+        <div className="absolute bottom-0 left-0 right-0 bg-red-500/90 text-white text-[10px] font-bold py-1.5 text-center backdrop-blur-sm z-20">
+          <AlertCircle size={10} className="inline mr-1 mb-0.5"/> 
+          {conbini.warning}
         </div>
-        <div className="text-sm text-[#5D4037] leading-loose text-justify font-serif">
-          <span className="font-bold block mb-1 text-[#E65100] text-xs tracking-widest">GUIDE'S NOTE</span>
-          {text}
+      )}
+
+      {!conbini.warning && (
+        <div className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto no-scrollbar z-20">
+          {conbini.stores.map((store, idx) => (
+            <div key={idx} className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm border border-slate-100 flex items-center gap-2 shrink-0">
+               <div className={`w-2 h-2 rounded-full ${getPinColor(store.type).replace('text-', 'bg-')}`}></div>
+               <div className="flex flex-col">
+                 <span className="text-[10px] font-bold text-slate-700 leading-none">{store.name}</span>
+                 <span className="text-[8px] text-slate-400 font-sans leading-none mt-0.5">{store.dist}</span>
+               </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </a>
+  );
+};
+
+const Recommendations = ({ data }) => {
+  if (!data) return null;
+  return (
+    <div className="mb-8 space-y-4 animate-fadeIn">
+      <div className="flex items-center gap-2 mb-2">
+        <Star size={16} className="text-[#D32F2F]" />
+        <h3 className="text-sm font-serif font-bold text-slate-800 tracking-widest">嚴選・推薦</h3>
+      </div>
+      
+      <div className="grid grid-cols-1 gap-3">
+        {/* Eat */}
+        <div className="bg-[#FFF5F5] p-4 rounded-xl border border-[#FFEBEE] relative overflow-hidden">
+           <div className="absolute right-0 top-0 opacity-10 transform translate-x-2 -translate-y-2">
+             <Utensils size={60} className="text-[#D32F2F]" />
+           </div>
+           <div className="relative z-10">
+             <h4 className="text-[10px] font-bold text-[#D32F2F] mb-2 tracking-wider flex items-center gap-1">
+               <Utensils size={12}/> MUST EAT
+             </h4>
+             <ul className="space-y-2">
+               {data.eat.map((item, i) => (
+                 <li key={i} className="flex items-start gap-2">
+                   <div className="w-1 h-1 bg-[#D32F2F] rounded-full mt-1.5 shrink-0"></div>
+                   <div>
+                     <span className="text-sm font-bold text-slate-800 block">{item.name}</span>
+                     <span className="text-xs text-slate-500 font-serif">{item.desc}</span>
+                   </div>
+                 </li>
+               ))}
+             </ul>
+           </div>
+        </div>
+
+        {/* Buy */}
+        <div className="bg-[#F0F9FF] p-4 rounded-xl border border-[#E0F2FE] relative overflow-hidden">
+           <div className="absolute right-0 top-0 opacity-10 transform translate-x-2 -translate-y-2">
+             <ShoppingBag size={60} className="text-[#0284C7]" />
+           </div>
+           <div className="relative z-10">
+             <h4 className="text-[10px] font-bold text-[#0284C7] mb-2 tracking-wider flex items-center gap-1">
+               <ShoppingBag size={12}/> MUST BUY
+             </h4>
+             <ul className="space-y-2">
+               {data.buy.map((item, i) => (
+                 <li key={i} className="flex items-start gap-2">
+                   <div className="w-1 h-1 bg-[#0284C7] rounded-full mt-1.5 shrink-0"></div>
+                   <div>
+                     <span className="text-sm font-bold text-slate-800 block">{item.name}</span>
+                     <span className="text-xs text-slate-500 font-serif">{item.desc}</span>
+                   </div>
+                 </li>
+               ))}
+             </ul>
+           </div>
         </div>
       </div>
-    );
+    </div>
+  );
+};
 
-    const ConbiniMapCard = ({ conbini }) => {
-      const getPinColor = (type) => {
-        if (type === '711') return "text-[#EA5404]"; 
-        if (type === 'family' || type === 'lawson') return "text-[#0091DA]"; 
-        if (type === 'daily') return "text-[#D9232A]"; 
-        return "text-slate-500"; 
-      };
+// --- Main Views ---
 
-      return (
-        <a href={conbini.link} target="_blank" rel="noopener noreferrer" className="block group relative w-full h-48 rounded-xl overflow-hidden border border-slate-200 shadow-sm transition-shadow hover:shadow-md mt-4">
-          <div className="absolute inset-0 bg-[#F2F4F6]">
-            <div className="absolute top-0 left-1/3 w-4 h-full bg-white/80 border-x border-slate-200/50 transform -skew-x-12"></div>
-            <div className="absolute top-1/3 left-0 w-full h-4 bg-white/80 border-y border-slate-200/50 transform skew-y-6"></div>
-            <div className="absolute bottom-10 right-0 w-2/3 h-3 bg-white/80 border-y border-slate-200/50"></div>
-            
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-               <div className="relative">
-                 <div className="w-4 h-4 bg-blue-500/20 rounded-full animate-ping absolute"></div>
-                 <LucideIcon name="map-pin" size={32} className="text-blue-600 fill-white drop-shadow-md" />
-               </div>
-            </div>
+const ItineraryView = ({ onExpand }) => (
+  <div className="space-y-6 pb-28">
+    <div className="flex items-center justify-center gap-3 mb-8 px-2 relative">
+      <div className="h-[1px] w-10 bg-slate-300"></div>
+      <h2 className="text-2xl font-serif font-bold text-slate-800 tracking-widest text-center">旅の行程</h2>
+      <div className="h-[1px] w-10 bg-slate-300"></div>
+    </div>
 
-            {conbini.stores.map((store, idx) => {
-               const positions = [{ top: '20%', left: '20%' }, { top: '30%', left: '80%' }, { top: '70%', left: '30%' }, { top: '60%', left: '70%' }];
-               const pos = positions[idx % positions.length];
-               return (
-                 <div key={idx} className="absolute z-0 transform hover:scale-110 transition-transform" style={pos}>
-                    <div className="flex flex-col items-center">
-                       <LucideIcon name="store" size={24} className={`${getPinColor(store.type)} fill-white drop-shadow-sm`} />
-                    </div>
-                 </div>
-               )
-            })}
-          </div>
-
-          <div className="absolute top-3 left-3 right-3 bg-white/95 backdrop-blur rounded-full px-4 py-2.5 shadow-md border border-slate-100 flex items-center gap-3 z-20">
-             <LucideIcon name="search" size={16} className="text-slate-400" />
-             <div className="flex-1 truncate text-xs font-bold text-slate-700 font-sans">
-               {conbini.searchQuery || "Convenience store near here"}
-             </div>
-             <div className="bg-slate-100 p-1 rounded-full">
-               <LucideIcon name="external-link" size={12} className="text-slate-400" />
-             </div>
-          </div>
-
-          {conbini.warning && (
-            <div className="absolute bottom-0 left-0 right-0 bg-red-500/90 text-white text-[10px] font-bold py-1.5 text-center backdrop-blur-sm z-20">
-              <span className="inline-flex items-center gap-1"><LucideIcon name="alert-circle" size={10}/> {conbini.warning}</span>
-            </div>
-          )}
-
-          {!conbini.warning && (
-            <div className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto no-scrollbar z-20">
-              {conbini.stores.map((store, idx) => (
-                <div key={idx} className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm border border-slate-100 flex items-center gap-2 shrink-0">
-                   <div className={`w-2 h-2 rounded-full ${getPinColor(store.type).replace('text-', 'bg-')}`}></div>
-                   <div className="flex flex-col">
-                     <span className="text-[10px] font-bold text-slate-700 leading-none">{store.name}</span>
-                     <span className="text-[8px] text-slate-400 font-sans leading-none mt-0.5">{store.dist}</span>
-                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </a>
-      );
-    };
-
-    const ImageWithFallback = ({ src, alt, className }) => {
-      const [loaded, setLoaded] = useState(false);
-      const [error, setError] = useState(false);
-
-      return (
-        <div className={`relative bg-slate-100 overflow-hidden ${className}`}>
-          {!loaded && !error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-slate-50">
-              <div className="w-6 h-6 border-2 border-slate-300 border-t-[#D32F2F] rounded-full animate-spin"></div>
-            </div>
-          )}
-          <img 
-            src={src} 
-            alt={alt} 
-            className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-            onLoad={() => setLoaded(true)}
-            onError={(e) => {
-              setError(true);
-              setLoaded(true);
-              e.target.style.display = 'none'; 
-            }}
-          />
-          {error && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 text-slate-400 p-2 text-center">
-              <LucideIcon name="image" size={20} className="mb-1 opacity-50" />
-              <span className="text-[10px]">{alt}</span>
-            </div>
-          )}
-        </div>
-      );
-    };
-
-    const Recommendations = ({ data }) => {
-      if (!data) return null;
-      return (
-        <div className="mb-10 space-y-5 animate-fadeIn">
-          <div className="flex items-center gap-2 mb-2">
-            <LucideIcon name="star" size={16} className="text-[#D32F2F]" />
-            <h3 className="text-sm font-serif font-bold text-slate-800 tracking-widest">嚴選・推薦</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-[#FFE4E6] shadow-[0_2px_10px_rgba(254,226,226,0.3)]">
-               <h4 className="text-[10px] font-bold text-[#D32F2F] mb-3 tracking-wider flex items-center gap-1.5 border-b border-[#FFE4E6] pb-2">
-                 <LucideIcon name="utensils" size={12}/> MUST EAT
-               </h4>
-               <div className="space-y-3">
-                 {data.eat.map((item, i) => (
-                   <div key={i} className="flex gap-3 items-center">
-                     <ImageWithFallback src={item.image} alt={item.name} className="w-12 h-12 rounded-lg shrink-0 shadow-sm" />
-                     <div>
-                       <span className="text-sm font-bold text-slate-800 block leading-tight">{item.name}</span>
-                       <span className="text-[10px] text-slate-500 font-serif mt-0.5 block">{item.desc}</span>
-                     </div>
-                   </div>
-                 ))}
-               </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl border border-[#E0F2FE] shadow-[0_2px_10px_rgba(224,242,254,0.3)]">
-               <h4 className="text-[10px] font-bold text-[#0284C7] mb-3 tracking-wider flex items-center gap-1.5 border-b border-[#E0F2FE] pb-2">
-                 <LucideIcon name="shopping-bag" size={12}/> MUST BUY
-               </h4>
-               <div className="space-y-3">
-                 {data.buy.map((item, i) => (
-                   <div key={i} className="flex gap-3 items-center">
-                     <ImageWithFallback src={item.image} alt={item.name} className="w-12 h-12 rounded-lg shrink-0 shadow-sm" />
-                     <div>
-                       <span className="text-sm font-bold text-slate-800 block leading-tight">{item.name}</span>
-                       <span className="text-[10px] text-slate-500 font-serif mt-0.5 block">{item.desc}</span>
-                     </div>
-                   </div>
-                 ))}
-               </div>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    const ItineraryView = ({ onExpand }) => (
-      <div className="space-y-6 pb-28">
-        <div className="flex items-center justify-center gap-3 mb-8 px-2 relative">
-          <div className="h-[1px] w-10 bg-slate-300"></div>
-          <h2 className="text-2xl font-serif font-bold text-slate-800 tracking-widest text-center">旅の行程</h2>
-          <div className="h-[1px] w-10 bg-slate-300"></div>
-        </div>
-
-        {itineraryData.map((day) => (
-          <div 
-            key={day.day}
-            onClick={() => onExpand(day)}
-            className="bg-white/80 backdrop-blur-md rounded-none p-0 border-l-4 border-[#D32F2F] shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden active:bg-[#FFF5F5] transition-colors cursor-pointer group hover:shadow-md mb-6"
-          >
-            {day.heroImage && (
-              <div className="h-24 w-full relative overflow-hidden">
-                <ImageWithFallback src={day.heroImage} alt={day.location} className="w-full h-full opacity-90 group-hover:scale-105 transition-transform duration-700" />
-                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent"></div>
+    {itineraryData.map((day) => (
+      <div 
+        key={day.day}
+        onClick={() => onExpand(day)}
+        className="bg-white/80 backdrop-blur-md rounded-none p-6 border-l-4 border-[#D32F2F] shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden active:bg-[#FFF5F5] transition-colors cursor-pointer group hover:shadow-md"
+      >
+        <div className="flex justify-between items-start relative z-10">
+          <div className="flex-1">
+            <div className="flex items-baseline gap-4 mb-3">
+              <div className="flex flex-col items-center">
+                 <span className="text-3xl font-serif font-bold text-[#D32F2F] leading-none">{day.date.split('/')[1].split(' ')[0]}</span>
+                 <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Dec</span>
               </div>
-            )}
-            
-            <div className="p-6 -mt-12 relative z-10">
-              <div className="flex justify-between items-end">
-                <div className="flex items-baseline gap-4">
-                  <div className="flex flex-col items-center">
-                     <span className="text-4xl font-serif font-bold text-[#D32F2F] leading-none drop-shadow-sm">{day.date.split('/')[1].split(' ')[0]}</span>
-                     <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mt-1">Dec</span>
-                  </div>
-                  <div className="flex flex-col">
-                     <h3 className="text-xl font-serif font-bold text-slate-800 mb-1">{day.location}</h3>
-                     <p className="text-xs text-slate-500 font-serif tracking-wide line-clamp-1">{day.intro}</p>
-                  </div>
+              <div className="flex flex-col">
+                 <h3 className="text-xl font-serif font-bold text-slate-800 mb-1">{day.location}</h3>
+                 <p className="text-xs text-slate-500 font-serif tracking-wide line-clamp-1">{day.intro}</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col items-center pl-4 border-l border-slate-100">
+             {day.weather === 'sun' ? <Sun size={20} className="text-slate-400" strokeWidth={1.5}/> : (day.weather === 'cloudy' ? <CloudRain size={20} className="text-slate-400" strokeWidth={1.5}/> : <CloudSnow size={20} className="text-slate-400" strokeWidth={1.5}/>)}
+             <span className="text-xs font-serif mt-1 text-slate-500">{day.temp}</span>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+const DetailModal = ({ day, onClose }) => {
+  if (!day) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="bg-[#FFFEFA] w-full h-[92vh] sm:w-[450px] sm:h-[85vh] sm:rounded-t-3xl rounded-t-3xl shadow-2xl relative flex flex-col animate-slideUp font-serif">
+        
+        <div className="bg-white/90 backdrop-blur-md p-6 rounded-t-3xl border-b border-[#F0E0E0] shrink-0 flex justify-between items-start sticky top-0 z-20">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <span className="bg-[#D32F2F] text-white px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase">{day.tag}</span>
+              <span className="text-slate-400 text-xs font-bold tracking-wider">{day.date}</span>
+            </div>
+            <h2 className="text-3xl font-serif font-bold text-slate-800 mt-2">{day.location}</h2>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
+            <ChevronDown size={24} strokeWidth={1.5} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-20">
+          {/* Intro */}
+          <div className="relative pl-4">
+             <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#D32F2F]"></div>
+             <p className="text-sm text-slate-600 leading-loose font-serif italic">
+               {day.intro}
+             </p>
+          </div>
+
+          {/* Recommendations Block */}
+          {day.recommends && <Recommendations data={day.recommends} />}
+
+          {/* Timeline */}
+          <div className="space-y-0 relative pl-2">
+            <div className="absolute left-[19px] top-4 bottom-4 w-[1px] bg-slate-200"></div>
+
+            {day.activities.map((act, i) => (
+              <div key={i} className="flex gap-6 relative mb-10 last:mb-0 group">
+                <div className={`w-10 h-10 rounded-full shrink-0 border-[1px] border-slate-200 bg-white z-10 flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.05)] group-hover:border-[#D32F2F] transition-colors`}>
+                   {act.type === 'flight' && <Plane size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-[#D32F2F]" />}
+                   {act.type === 'arrival' && <MapPin size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-[#D32F2F]" />}
+                   {act.type === 'food' && <Utensils size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-[#D32F2F]" />}
+                   {act.type === 'sightseeing' && <Camera size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-[#D32F2F]" />}
+                   {act.type === 'shopping' && <ShoppingBag size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-[#D32F2F]" />}
+                   {act.type === 'transport' && <Train size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-[#D32F2F]" />}
+                   {act.type === 'activity' && <Gift size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-[#D32F2F]" />}
                 </div>
                 
-                <div className="flex flex-col items-center pl-4 border-l border-slate-200">
-                   <LucideIcon name={day.weather === 'sun' ? 'sun' : day.weather === 'cloudy' ? 'cloud-rain' : 'cloud-snow'} size={20} className="text-slate-400" strokeWidth={1.5} />
-                   <span className="text-xs font-serif mt-1 text-slate-500">{day.temp}</span>
+                <div className="flex-1 pt-1">
+                  <div className="flex flex-col mb-2">
+                    <span className="text-xs font-bold text-slate-400 font-sans tracking-wider mb-1">{act.time}</span>
+                    <span className="text-xl font-serif font-bold text-slate-800">{act.title}</span>
+                  </div>
+                  
+                  <p className="text-sm text-slate-600 leading-relaxed mb-3 font-serif">{act.desc}</p>
+                  
+                  {(act.highlight || act.tag) && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {act.tag && <span className="text-[10px] border border-[#D32F2F] text-[#D32F2F] px-2 py-0.5 tracking-wider">{act.tag}</span>}
+                      {act.highlight && <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 tracking-wider">★ {act.highlight}</span>}
+                    </div>
+                  )}
+
+                  {act.guide && <GuideCard text={act.guide} />}
+
+                  {act.important && (
+                    <div className="mt-4 text-xs text-[#D32F2F] flex items-start gap-2 leading-relaxed bg-red-50/50 p-3 rounded border border-red-100">
+                      <AlertCircle size={14} className="shrink-0 mt-0.5"/> 
+                      <span>{act.important}</span>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-
-    const DetailModal = ({ day, onClose }) => {
-      if (!day) return null;
-      return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
-          <div className="bg-[#FFFEFA] w-full h-[95vh] sm:w-[450px] sm:h-[90vh] sm:rounded-t-3xl rounded-t-3xl shadow-2xl relative flex flex-col animate-slideUp font-serif overflow-hidden">
-            
-            <div className="relative h-48 shrink-0">
-               {day.heroImage && (
-                 <ImageWithFallback src={day.heroImage} className="w-full h-full" alt={day.location} />
-               )}
-               <div className="absolute inset-0 bg-gradient-to-t from-[#FFFEFA] to-transparent"></div>
-               
-               <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-black/20 backdrop-blur-md rounded-full text-white hover:bg-black/30 transition-colors z-20">
-                 <LucideIcon name="chevron-down" size={24} strokeWidth={1.5} />
-               </button>
-
-               <div className="absolute bottom-4 left-6 z-10">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="bg-[#D32F2F] text-white px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase shadow-sm">{day.tag}</span>
-                    <span className="text-slate-600 text-xs font-bold tracking-wider bg-white/80 px-2 py-0.5 rounded backdrop-blur-sm">{day.date}</span>
-                  </div>
-                  <h2 className="text-3xl font-serif font-bold text-slate-800 mt-1 drop-shadow-sm">{day.location}</h2>
-               </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-20 -mt-2 relative z-10 bg-[#FFFEFA] rounded-t-3xl">
-              
-              <div className="relative pl-4 border-l-2 border-[#D32F2F]">
-                 <p className="text-sm text-slate-600 leading-loose font-serif italic">
-                   {day.intro}
-                 </p>
-              </div>
-
-              {day.recommends && <Recommendations data={day.recommends} />}
-
-              <div className="space-y-0 relative pl-2">
-                <div className="absolute left-[19px] top-4 bottom-4 w-[1px] bg-slate-200"></div>
-
-                {day.activities.map((act, i) => (
-                  <div key={i} className="flex gap-6 relative mb-12 last:mb-0 group">
-                    <div className={`w-10 h-10 rounded-full shrink-0 border-[1px] border-slate-200 bg-white z-10 flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.05)] group-hover:border-[#D32F2F] transition-colors`}>
-                       {/* Icon selection logic */}
-                       <LucideIcon 
-                         name={act.type === 'flight' ? 'plane' : act.type === 'arrival' ? 'map-pin' : act.type === 'food' ? 'utensils' : act.type === 'sightseeing' ? 'camera' : act.type === 'shopping' ? 'shopping-bag' : 'gift'} 
-                         size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-[#D32F2F]" 
-                       />
-                    </div>
-                    
-                    <div className="flex-1 pt-1">
-                      <div className="flex flex-col mb-2">
-                        <span className="text-xs font-bold text-slate-400 font-sans tracking-wider mb-1">{act.time}</span>
-                        <span className="text-xl font-serif font-bold text-slate-800 leading-tight">{act.title}</span>
-                      </div>
-                      
-                      <p className="text-sm text-slate-600 leading-relaxed mb-3 font-serif">{act.desc}</p>
-                      
-                      {act.image && (
-                        <div className="mb-4 rounded-lg overflow-hidden shadow-sm">
-                          <ImageWithFallback src={act.image} alt={act.title} className="w-full h-32 hover:scale-105 transition-transform duration-500" />
-                        </div>
-                      )}
-                      
-                      {(act.highlight || act.tag) && (
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {act.tag && <span className="text-[10px] border border-[#D32F2F] text-[#D32F2F] px-2 py-0.5 tracking-wider">{act.tag}</span>}
-                          {act.highlight && <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 tracking-wider">★ {act.highlight}</span>}
-                        </div>
-                      )}
-
-                      {act.guide && <GuideCard text={act.guide} />}
-
-                      {act.important && (
-                        <div className="mt-4 text-xs text-[#D32F2F] flex items-start gap-2 leading-relaxed bg-red-50/50 p-3 rounded border border-red-100">
-                          <LucideIcon name="alert-circle" size={14} className="shrink-0 mt-0.5"/> 
-                          <span>{act.important}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {day.hotel && (
-                <div className="mt-12 pt-8 border-t border-slate-100">
-                  <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <div className="flex items-start gap-4">
-                      <div className="mt-1">
-                        <LucideIcon name="bed-double" size={24} strokeWidth={1.5} className="text-[#D32F2F]" />
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-1">ACCOMMODATION</div>
-                        <div className="text-lg font-serif font-bold text-slate-800">{day.hotel}</div>
-                        {day.hotelTel && <div className="text-xs text-slate-500 mt-1 font-sans tracking-wider">{day.hotelTel}</div>}
-                      </div>
-                    </div>
-
-                    {day.conbini && <ConbiniMapCard conbini={day.conbini} />}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    const ShoppingView = () => {
-      const [items, setItems] = useState([]);
-      const [gifts, setGifts] = useState([]);
-      const [desc, setDesc] = useState('');
-      const [amount, setAmount] = useState('');
-      const [giftWho, setGiftWho] = useState('');
-      const [giftItem, setGiftItem] = useState('');
-      const [subTab, setSubTab] = useState('wallet');
-
-      useEffect(() => {
-        const savedExp = localStorage.getItem('tohoku_v5_expenses');
-        const savedGift = localStorage.getItem('tohoku_v5_gifts');
-        if (savedExp) setItems(JSON.parse(savedExp));
-        if (savedGift) setGifts(JSON.parse(savedGift));
-      }, []);
-
-      useEffect(() => {
-        localStorage.setItem('tohoku_v5_expenses', JSON.stringify(items));
-      }, [items]);
-      useEffect(() => {
-        localStorage.setItem('tohoku_v5_gifts', JSON.stringify(gifts));
-      }, [gifts]);
-
-      const addExpense = (e) => {
-        e.preventDefault();
-        if (!desc || !amount) return;
-        setItems([{ id: Date.now(), desc, amount: parseFloat(amount) }, ...items]);
-        setDesc(''); setAmount('');
-      };
-
-      const addGift = (e) => {
-        e.preventDefault();
-        if (!giftWho || !giftItem) return;
-        setGifts([{ id: Date.now(), who: giftWho, item: giftItem, bought: false }, ...gifts]);
-        setGiftWho(''); setGiftItem('');
-      };
-
-      const toggleGift = (id) => {
-        setGifts(gifts.map(g => g.id === id ? { ...g, bought: !g.bought } : g));
-      };
-
-      const total = items.reduce((acc, cur) => acc + cur.amount, 0);
-
-      return (
-        <div className="space-y-8 pb-24">
-          <div className="flex justify-center gap-8 mb-8 border-b border-slate-200 pb-1">
-            <button onClick={() => setSubTab('wallet')} className={`pb-3 text-sm font-bold tracking-widest transition-all ${subTab === 'wallet' ? 'text-[#D32F2F] border-b-2 border-[#D32F2F]' : 'text-slate-400'}`}>記帳本</button>
-            <button onClick={() => setSubTab('gifts')} className={`pb-3 text-sm font-bold tracking-widest transition-all ${subTab === 'gifts' ? 'text-[#D32F2F] border-b-2 border-[#D32F2F]' : 'text-slate-400'}`}>伴手禮</button>
-          </div>
-
-          {subTab === 'wallet' ? (
-            <div className="animate-fadeIn">
-              <div className="bg-white p-8 rounded-none border-y border-slate-200 mb-8 text-center relative">
-                 <p className="text-[10px] text-slate-400 mb-2 font-bold tracking-[0.2em] uppercase">Total Expenses</p>
-                 <div className="text-5xl font-serif font-bold text-slate-800 tracking-tighter">
-                   <span className="text-2xl mr-2 font-light text-slate-400">¥</span>{total.toLocaleString()}
-                 </div>
-              </div>
-              
-              <form onSubmit={addExpense} className="flex gap-3 mb-6 px-4">
-                 <input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Item Name" className="flex-1 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
-                 <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="¥" className="w-24 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
-                 <button type="submit" className="text-[#D32F2F] hover:bg-red-50 rounded-full w-10 h-10 flex items-center justify-center transition-colors"><LucideIcon name="plus"/></button>
-              </form>
-
-              <div className="space-y-0 px-4">
-                {items.map(i => (
-                  <div key={i.id} className="bg-white py-4 border-b border-slate-100 flex justify-between items-center">
-                    <span className="text-slate-700 font-serif font-medium text-lg">{i.desc}</span>
-                    <div className="flex items-center gap-4">
-                      <span className="font-serif font-bold text-slate-800 text-lg">¥ {i.amount.toLocaleString()}</span>
-                      <span className="text-slate-300 cursor-pointer hover:text-[#D32F2F] transition-colors" onClick={() => setItems(items.filter(x => x.id !== i.id))}><LucideIcon name="trash-2" size={16}/></span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="animate-fadeIn px-4">
-               <form onSubmit={addGift} className="bg-white p-6 rounded-xl border border-slate-200 mb-6 shadow-sm">
-                 <div className="flex flex-col gap-4">
-                   <input value={giftWho} onChange={e=>setGiftWho(e.target.value)} placeholder="For Whom? (e.g., Boss)" className="bg-slate-50 rounded px-4 py-3 text-sm font-serif focus:outline-none focus:ring-1 focus:ring-[#D32F2F]" />
-                   <div className="flex gap-3">
-                     <input value={giftItem} onChange={e=>setGiftItem(e.target.value)} placeholder="What to buy?" className="flex-1 bg-slate-50 rounded px-4 py-3 text-sm font-serif focus:outline-none focus:ring-1 focus:ring-[#D32F2F]" />
-                     <button type="submit" className="bg-[#D32F2F] text-white rounded px-6 text-sm font-bold tracking-wider hover:bg-red-700 transition-colors">ADD</button>
-                   </div>
-                 </div>
-               </form>
-
-               <div className="space-y-3">
-                 {gifts.map(g => (
-                   <div key={g.id} onClick={() => toggleGift(g.id)} className={`p-5 rounded-lg border cursor-pointer transition-all flex items-center gap-4 ${g.bought ? 'bg-slate-50 border-transparent opacity-60' : 'bg-white border-slate-200 shadow-sm hover:border-[#D32F2F]'}`}>
-                     <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${g.bought ? 'bg-[#D32F2F] border-[#D32F2F]' : 'border-slate-300'}`}>
-                       {g.bought && <LucideIcon name="check-square" size={14} className="text-white" />}
-                     </div>
-                     <div className="flex-1">
-                       <div className={`font-serif font-bold text-lg ${g.bought ? 'line-through text-slate-400' : 'text-slate-800'}`}>{g.who}</div>
-                       <div className="text-sm text-slate-500 font-serif italic">{g.item}</div>
-                     </div>
-                     {g.bought && <span className="text-[10px] text-[#D32F2F] font-bold tracking-widest border border-[#D32F2F] px-2 py-1">BOUGHT</span>}
-                   </div>
-                 ))}
-               </div>
-            </div>
-          )}
-        </div>
-      );
-    };
-
-    const CheckListSection = ({ title, color, listKey }) => {
-      const [items, setItems] = useState([]);
-      const defaultItems = listKey === 'carryon' 
-        ? ["發熱衣", "防風外套", "圍巾/手套", "毛帽", "防滑靴", "護唇膏", "行動電源"]
-        : ["常備藥", "乳液", "牙刷牙膏", "轉接頭", "充電器", "壓縮袋", "大購物袋"];
-
-      useEffect(() => {
-        const saved = localStorage.getItem(`tohoku_v5_${listKey}`);
-        if (saved) setItems(JSON.parse(saved));
-        else setItems(defaultItems.map((txt, i) => ({ id: i, text: txt, checked: false })));
-      }, []);
-
-      const toggle = (id) => {
-        const newItems = items.map(i => i.id === id ? { ...i, checked: !i.checked } : i);
-        setItems(newItems);
-        localStorage.setItem(`tohoku_v5_${listKey}`, JSON.stringify(newItems));
-      }
-
-      return (
-        <div className="bg-white p-6 rounded-none border border-slate-200">
-          <h3 className={`font-serif font-bold mb-4 tracking-wider flex items-center gap-2 ${color === 'rose' ? 'text-[#D32F2F]' : 'text-emerald-700'}`}>
-            <div className={`w-2 h-2 rounded-full ${color === 'rose' ? 'bg-[#D32F2F]' : 'bg-emerald-700'}`}></div>
-            {title}
-          </h3>
-          <div className="space-y-3">
-            {items.map(item => (
-              <div key={item.id} onClick={() => toggle(item.id)} className="flex items-center gap-4 cursor-pointer group">
-                <div className={`w-5 h-5 border flex items-center justify-center transition-colors ${item.checked ? (color==='rose'?'bg-[#D32F2F] border-[#D32F2F]':'bg-emerald-700 border-emerald-700') : 'border-slate-300 group-hover:border-slate-400'}`}>
-                  {item.checked && <LucideIcon name="check-square" size={12} className="text-white"/>}
-                </div>
-                <span className={`text-sm font-serif ${item.checked ? 'text-slate-300 line-through decoration-slate-300' : 'text-slate-700'}`}>{item.text}</span>
               </div>
             ))}
           </div>
-        </div>
-      )
-    }
-
-    const ToolsView = () => {
-      const [activeTool, setActiveTool] = useState('phrase');
-      const phrases = [
-        { jp: "すみません", en: "Su-mi-ma-sen", ch: "不好意思" },
-        { jp: "ありがとう", en: "A-ri-ga-tou", ch: "謝謝" },
-        { jp: "これください", en: "Ko-re Ku-da-sai", ch: "請給我這個" },
-        { jp: "いくらですか", en: "I-ku-ra De-su-ka", ch: "請問多少錢？" },
-        { jp: "トイレはどこ？", en: "To-i-re Wa Do-ko", ch: "廁所在哪裡？" },
-        { jp: "免税できますか", en: "Men-zei De-ki-ma-su-ka", ch: "可以退稅嗎？" },
-      ];
-
-      return (
-        <div className="pb-24">
-           <div className="flex justify-center gap-2 mb-8 px-4 overflow-x-auto pb-2 scrollbar-hide">
-             <button onClick={()=>setActiveTool('phrase')} className={`tool-tab ${activeTool==='phrase'?'active':''}`}><LucideIcon name="message-circle" size={16}/> 指指通</button>
-             <button onClick={()=>setActiveTool('pack')} className={`tool-tab ${activeTool==='pack'?'active':''}`}><LucideIcon name="check-square" size={16}/> 清單</button>
-             <button onClick={()=>setActiveTool('info')} className={`tool-tab ${activeTool==='info'?'active':''}`}><LucideIcon name="info" size={16}/> 資訊</button>
-           </div>
-
-           {activeTool === 'phrase' && (
-             <div className="grid grid-cols-2 gap-4 animate-fadeIn px-4">
-                {phrases.map((p, i) => (
-                  <div key={i} className="bg-white p-6 rounded-none border border-slate-200 flex flex-col items-center text-center active:scale-95 transition-transform cursor-pointer hover:shadow-md">
-                    <div className="text-xl font-serif font-bold text-slate-800 mb-2">{p.jp}</div>
-                    <div className="text-[10px] text-[#D32F2F] font-bold tracking-widest uppercase mb-3">{p.en}</div>
-                    <div className="text-sm font-medium text-slate-500 font-serif">{p.ch}</div>
+          
+          {day.hotel && (
+            <div className="mt-12 pt-8 border-t border-slate-100">
+              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="mt-1">
+                    <BedDouble size={24} strokeWidth={1.5} className="text-[#D32F2F]" />
                   </div>
-                ))}
-             </div>
-           )}
-           {activeTool === 'pack' && (
-             <div className="space-y-8 animate-fadeIn px-4">
-                <CheckListSection title="隨身 / 穿搭" color="rose" listKey="carryon" />
-                <CheckListSection title="託運行李" color="emerald" listKey="luggage" />
-             </div>
-           )}
-           {activeTool === 'info' && (
-             <div className="space-y-6 animate-fadeIn px-4">
-                <div className="bg-white p-6 rounded-none border border-slate-200 shadow-[4px_4px_0px_rgba(0,0,0,0.05)]">
-                  <h3 className="font-serif font-bold text-slate-800 mb-4 flex items-center gap-3 text-lg">
-                    <span className="bg-[#D32F2F] w-1 h-6 block"></span>
-                    緊急聯絡
-                  </h3>
-                  <div className="space-y-4 text-sm font-serif">
-                    <div className="flex justify-between border-b border-slate-100 pb-3">
-                      <span className="text-slate-500">導遊 (周薇)</span>
-                      <a href="tel:0905377507" className="text-slate-800 font-bold hover:text-[#D32F2F]">0905-377-507</a>
-                    </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-3">
-                      <span className="text-slate-500">導遊 (日本)</span>
-                      <a href="tel:+818049413523" className="text-slate-800 font-bold hover:text-[#D32F2F]">080-4941-3523</a>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-500">旅外救助</span>
-                      <a href="tel:0800085095" className="text-slate-800 font-bold hover:text-[#D32F2F]">0800-085-095</a>
-                    </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-1">ACCOMMODATION</div>
+                    <div className="text-lg font-serif font-bold text-slate-800">{day.hotel}</div>
+                    {day.hotelTel && <div className="text-xs text-slate-500 mt-1 font-sans tracking-wider">{day.hotelTel}</div>}
                   </div>
                 </div>
-             </div>
-           )}
-        </div>
-      )
-    };
 
-    const NavBtn = ({ icon, label, active, onClick }) => (
-      <button onClick={onClick} className={`flex flex-col items-center gap-1 w-16 transition-all duration-300 ${active ? 'text-[#D32F2F]' : 'text-slate-300'}`}>
-        <div className={`p-1 transition-all ${active ? '-translate-y-1' : ''}`}>
-           <LucideIcon name={icon} size={24} strokeWidth={1.5} />
-        </div>
-        <span className="text-[10px] font-serif font-bold tracking-widest">{label}</span>
-      </button>
-    );
-
-    const App = () => {
-      const [activeTab, setActiveTab] = useState('itinerary');
-      const [modalData, setModalData] = useState(null);
-      const [displayWeather, setDisplayWeather] = useState(itineraryData[0]);
-
-      useEffect(() => {
-        if (modalData) {
-          setDisplayWeather(modalData);
-        }
-      }, [modalData]);
-
-      return (
-        <div className="min-h-screen bg-[#FFFEFA] font-serif text-slate-800 relative selection:bg-[#FFEBEE] selection:text-[#D32F2F]">
-          <Snowfall />
-
-          <header className="fixed top-0 left-0 right-0 z-40 bg-[#FFFEFA]/95 backdrop-blur-md pt-safe-top border-b border-[#F0E0E0]">
-            <div className="max-w-md mx-auto h-20 flex items-center justify-between px-6 relative">
-              <div className="flex flex-col">
-                <h1 className="text-2xl font-serif font-bold text-[#D32F2F] tracking-widest">冬の東北</h1>
-                <span className="text-[10px] text-slate-400 tracking-[0.2em] uppercase font-bold mt-1">Winter Trip 2025</span>
+                {day.conbini && <ConbiniMapCard conbini={day.conbini} />}
               </div>
-              <WeatherBadge 
-                type={displayWeather.weather} 
-                temp={displayWeather.temp} 
-                location={displayWeather.location.split('/')[0]} 
-              />
             </div>
-          </header>
-
-          <main className="max-w-md mx-auto pt-28 px-4 min-h-screen relative z-10">
-            {activeTab === 'itinerary' && <ItineraryView onExpand={setModalData} />}
-            {activeTab === 'shopping' && <ShoppingView />}
-            {activeTab === 'tools' && <ToolsView />}
-          </main>
-
-          {modalData && <DetailModal day={modalData} onClose={() => setModalData(null)} />}
-
-          <nav className="fixed bottom-0 left-0 right-0 bg-[#FFFEFA]/95 backdrop-blur-lg border-t border-[#F0E0E0] z-40 pb-safe-bottom">
-            <div className="max-w-md mx-auto flex justify-around items-center h-20">
-              <NavBtn icon="navigation" label="行程" active={activeTab==='itinerary'} onClick={()=>setActiveTab('itinerary')} />
-              <NavBtn icon="shopping-cart" label="購物" active={activeTab==='shopping'} onClick={()=>setActiveTab('shopping')} />
-              <NavBtn icon="briefcase" label="工具" active={activeTab==='tools'} onClick={()=>setActiveTab('tools')} />
-            </div>
-          </nav>
+          )}
         </div>
-      );
-    };
+      </div>
+    </div>
+  );
+};
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
-</body>
-</html>
+const ShoppingView = () => {
+  const [items, setItems] = useState([]);
+  const [gifts, setGifts] = useState([]);
+  const [desc, setDesc] = useState('');
+  const [amount, setAmount] = useState('');
+  const [giftWho, setGiftWho] = useState('');
+  const [giftItem, setGiftItem] = useState('');
+  const [subTab, setSubTab] = useState('wallet');
 
+  useEffect(() => {
+    const savedExp = localStorage.getItem('tohoku_v5_expenses');
+    const savedGift = localStorage.getItem('tohoku_v5_gifts');
+    if (savedExp) setItems(JSON.parse(savedExp));
+    if (savedGift) setGifts(JSON.parse(savedGift));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('tohoku_v5_expenses', JSON.stringify(items));
+  }, [items]);
+  useEffect(() => {
+    localStorage.setItem('tohoku_v5_gifts', JSON.stringify(gifts));
+  }, [gifts]);
+
+  const addExpense = (e) => {
+    e.preventDefault();
+    if (!desc || !amount) return;
+    setItems([{ id: Date.now(), desc, amount: parseFloat(amount) }, ...items]);
+    setDesc(''); setAmount('');
+  };
+
+  const addGift = (e) => {
+    e.preventDefault();
+    if (!giftWho || !giftItem) return;
+    setGifts([{ id: Date.now(), who: giftWho, item: giftItem, bought: false }, ...gifts]);
+    setGiftWho(''); setGiftItem('');
+  };
+
+  const toggleGift = (id) => {
+    setGifts(gifts.map(g => g.id === id ? { ...g, bought: !g.bought } : g));
+  };
+
+  const total = items.reduce((acc, cur) => acc + cur.amount, 0);
+
+  return (
+    <div className="space-y-8 pb-24">
+      <div className="flex justify-center gap-8 mb-8 border-b border-slate-200 pb-1">
+        <button 
+          onClick={() => setSubTab('wallet')}
+          className={`pb-3 text-sm font-bold tracking-widest transition-all ${subTab === 'wallet' ? 'text-[#D32F2F] border-b-2 border-[#D32F2F]' : 'text-slate-400'}`}
+        >
+          記帳本
+        </button>
+        <button 
+          onClick={() => setSubTab('gifts')}
+          className={`pb-3 text-sm font-bold tracking-widest transition-all ${subTab === 'gifts' ? 'text-[#D32F2F] border-b-2 border-[#D32F2F]' : 'text-slate-400'}`}
+        >
+          伴手禮
+        </button>
+      </div>
+
+      {subTab === 'wallet' ? (
+        <div className="animate-fadeIn">
+          <div className="bg-white p-8 rounded-none border-y border-slate-200 mb-8 text-center relative">
+             <p className="text-[10px] text-slate-400 mb-2 font-bold tracking-[0.2em] uppercase">Total Expenses</p>
+             <div className="text-5xl font-serif font-bold text-slate-800 tracking-tighter">
+               <span className="text-2xl mr-2 font-light text-slate-400">¥</span>{total.toLocaleString()}
+             </div>
+          </div>
+          
+          <form onSubmit={addExpense} className="flex gap-3 mb-6 px-4">
+             <input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Item Name" className="flex-1 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
+             <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="¥" className="w-24 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
+             <button type="submit" className="text-[#D32F2F] hover:bg-red-50 rounded-full w-10 h-10 flex items-center justify-center transition-colors"><Plus/></button>
+          </form>
+
+          <div className="space-y-0 px-4">
+            {items.map(i => (
+              <div key={i.id} className="bg-white py-4 border-b border-slate-100 flex justify-between items-center">
+                <span className="text-slate-700 font-serif font-medium text-lg">{i.desc}</span>
+                <div className="flex items-center gap-4">
+                  <span className="font-serif font-bold text-slate-800 text-lg">¥ {i.amount.toLocaleString()}</span>
+                  <Trash2 size={16} className="text-slate-300 cursor-pointer hover:text-[#D32F2F] transition-colors" onClick={() => setItems(items.filter(x => x.id !== i.id))} />
+                </div>
+              </div>
+            ))}
+            {items.length === 0 && <div className="text-center text-slate-300 py-12 text-sm font-serif italic">No expenses recorded yet.</div>}
+          </div>
+        </div>
+      ) : (
+        <div className="animate-fadeIn px-4">
+           <form onSubmit={addGift} className="bg-white p-6 rounded-xl border border-slate-200 mb-6 shadow-sm">
+             <div className="flex flex-col gap-4">
+               <input value={giftWho} onChange={e=>setGiftWho(e.target.value)} placeholder="For Whom? (e.g., Boss)" className="bg-slate-50 rounded px-4 py-3 text-sm font-serif focus:outline-none focus:ring-1 focus:ring-[#D32F2F]" />
+               <div className="flex gap-3">
+                 <input value={giftItem} onChange={e=>setGiftItem(e.target.value)} placeholder="What to buy?" className="flex-1 bg-slate-50 rounded px-4 py-3 text-sm font-serif focus:outline-none focus:ring-1 focus:ring-[#D32F2F]" />
+                 <button type="submit" className="bg-[#D32F2F] text-white rounded px-6 text-sm font-bold tracking-wider hover:bg-red-700 transition-colors">ADD</button>
+               </div>
+             </div>
+           </form>
+
+           <div className="space-y-3">
+             {gifts.map(g => (
+               <div key={g.id} onClick={() => toggleGift(g.id)} className={`p-5 rounded-lg border cursor-pointer transition-all flex items-center gap-4 ${g.bought ? 'bg-slate-50 border-transparent opacity-60' : 'bg-white border-slate-200 shadow-sm hover:border-[#D32F2F]'}`}>
+                 <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${g.bought ? 'bg-[#D32F2F] border-[#D32F2F]' : 'border-slate-300'}`}>
+                   {g.bought && <CheckSquare size={14} className="text-white" />}
+                 </div>
+                 <div className="flex-1">
+                   <div className={`font-serif font-bold text-lg ${g.bought ? 'line-through text-slate-400' : 'text-slate-800'}`}>{g.who}</div>
+                   <div className="text-sm text-slate-500 font-serif italic">{g.item}</div>
+                 </div>
+                 {g.bought && <span className="text-[10px] text-[#D32F2F] font-bold tracking-widest border border-[#D32F2F] px-2 py-1">BOUGHT</span>}
+               </div>
+             ))}
+             {gifts.length === 0 && <div className="text-center text-slate-300 py-12 text-sm font-serif italic">List is empty.</div>}
+           </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ToolsView = () => {
+  const [activeTool, setActiveTool] = useState('phrase');
+
+  const phrases = [
+    { jp: "すみません", en: "Su-mi-ma-sen", ch: "不好意思" },
+    { jp: "ありがとう", en: "A-ri-ga-tou", ch: "謝謝" },
+    { jp: "これください", en: "Ko-re Ku-da-sai", ch: "請給我這個" },
+    { jp: "いくらですか", en: "I-ku-ra De-su-ka", ch: "請問多少錢？" },
+    { jp: "トイレはどこ？", en: "To-i-re Wa Do-ko", ch: "廁所在哪裡？" },
+    { jp: "免税できますか", en: "Men-zei De-ki-ma-su-ka", ch: "可以退稅嗎？" },
+  ];
+
+  return (
+    <div className="pb-24">
+       <div className="flex justify-center gap-2 mb-8 px-4 overflow-x-auto pb-2 scrollbar-hide">
+         <button onClick={()=>setActiveTool('phrase')} className={`tool-tab ${activeTool==='phrase'?'active':''}`}><MessageCircle size={16}/> 指指通</button>
+         <button onClick={()=>setActiveTool('pack')} className={`tool-tab ${activeTool==='pack'?'active':''}`}><CheckSquare size={16}/> 清單</button>
+         <button onClick={()=>setActiveTool('info')} className={`tool-tab ${activeTool==='info'?'active':''}`}><Info size={16}/> 資訊</button>
+       </div>
+
+       {activeTool === 'phrase' && (
+         <div className="grid grid-cols-2 gap-4 animate-fadeIn px-4">
+            {phrases.map((p, i) => (
+              <div key={i} className="bg-white p-6 rounded-none border border-slate-200 flex flex-col items-center text-center active:scale-95 transition-transform cursor-pointer hover:shadow-md">
+                <div className="text-xl font-serif font-bold text-slate-800 mb-2">{p.jp}</div>
+                <div className="text-[10px] text-[#D32F2F] font-bold tracking-widest uppercase mb-3">{p.en}</div>
+                <div className="text-sm font-medium text-slate-500 font-serif">{p.ch}</div>
+              </div>
+            ))}
+         </div>
+       )}
+       {activeTool === 'pack' && (
+         <div className="space-y-8 animate-fadeIn px-4">
+            <CheckListSection title="隨身 / 穿搭" color="rose" listKey="carryon" />
+            <CheckListSection title="託運行李" color="emerald" listKey="luggage" />
+         </div>
+       )}
+       {activeTool === 'info' && (
+         <div className="space-y-6 animate-fadeIn px-4">
+            <div className="bg-white p-6 rounded-none border border-slate-200 shadow-[4px_4px_0px_rgba(0,0,0,0.05)]">
+              <h3 className="font-serif font-bold text-slate-800 mb-4 flex items-center gap-3 text-lg">
+                <span className="bg-[#D32F2F] w-1 h-6 block"></span>
+                緊急聯絡
+              </h3>
+              <div className="space-y-4 text-sm font-serif">
+                <div className="flex justify-between border-b border-slate-100 pb-3">
+                  <span className="text-slate-500">導遊 (周薇)</span>
+                  <a href="tel:0905377507" className="text-slate-800 font-bold hover:text-[#D32F2F]">0905-377-507</a>
+                </div>
+                <div className="flex justify-between border-b border-slate-100 pb-3">
+                  <span className="text-slate-500">導遊 (日本)</span>
+                  <a href="tel:+818049413523" className="text-slate-800 font-bold hover:text-[#D32F2F]">080-4941-3523</a>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">旅外救助</span>
+                  <a href="tel:0800085095" className="text-slate-800 font-bold hover:text-[#D32F2F]">0800-085-095</a>
+                </div>
+              </div>
+            </div>
+         </div>
+       )}
+    </div>
+  )
+}
+
+const CheckListSection = ({ title, color, listKey }) => {
+  const [items, setItems] = useState([]);
+  const defaultItems = listKey === 'carryon' 
+    ? ["發熱衣", "防風外套", "圍巾/手套", "毛帽", "防滑靴", "護唇膏", "行動電源"]
+    : ["常備藥", "乳液", "牙刷牙膏", "轉接頭", "充電器", "壓縮袋", "大購物袋"];
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`tohoku_v5_${listKey}`);
+    if (saved) setItems(JSON.parse(saved));
+    else setItems(defaultItems.map((txt, i) => ({ id: i, text: txt, checked: false })));
+  }, []);
+
+  const toggle = (id) => {
+    const newItems = items.map(i => i.id === id ? { ...i, checked: !i.checked } : i);
+    setItems(newItems);
+    localStorage.setItem(`tohoku_v5_${listKey}`, JSON.stringify(newItems));
+  }
+
+  return (
+    <div className="bg-white p-6 rounded-none border border-slate-200">
+      <h3 className={`font-serif font-bold mb-4 tracking-wider flex items-center gap-2 ${color === 'rose' ? 'text-[#D32F2F]' : 'text-emerald-700'}`}>
+        <div className={`w-2 h-2 rounded-full ${color === 'rose' ? 'bg-[#D32F2F]' : 'bg-emerald-700'}`}></div>
+        {title}
+      </h3>
+      <div className="space-y-3">
+        {items.map(item => (
+          <div key={item.id} onClick={() => toggle(item.id)} className="flex items-center gap-4 cursor-pointer group">
+            <div className={`w-5 h-5 border flex items-center justify-center transition-colors ${item.checked ? (color==='rose'?'bg-[#D32F2F] border-[#D32F2F]':'bg-emerald-700 border-emerald-700') : 'border-slate-300 group-hover:border-slate-400'}`}>
+              {item.checked && <CheckSquare size={12} className="text-white"/>}
+            </div>
+            <span className={`text-sm font-serif ${item.checked ? 'text-slate-300 line-through decoration-slate-300' : 'text-slate-700'}`}>{item.text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// --- App Shell ---
+
+export default function TohokuWinterAppComplete() {
+  const [activeTab, setActiveTab] = useState('itinerary');
+  const [modalData, setModalData] = useState(null);
+  const [displayWeather, setDisplayWeather] = useState(itineraryData[0]);
+
+  useEffect(() => {
+    if (modalData) {
+      setDisplayWeather(modalData);
+    }
+  }, [modalData]);
+
+  return (
+    <div className="min-h-screen bg-[#FFFEFA] font-serif text-slate-800 relative selection:bg-[#FFEBEE] selection:text-[#D32F2F]">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&display=swap');
+        .font-serif { font-family: 'Shippori Mincho', 'Noto Serif TC', serif; }
+        .font-sans { font-family: sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .animate-slideUp { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fall { animation-timing-function: linear; animation-iteration-count: infinite; }
+        .tool-tab { display:flex; align-items:center; gap:8px; padding:10px 20px; font-size:12px; font-weight:bold; letter-spacing: 0.05em; white-space:nowrap; transition:all 0.3s; background:transparent; color:#94a3b8; border-bottom:2px solid transparent; font-family: 'Noto Serif TC', serif; }
+        .tool-tab.active { color:#D32F2F; border-color:#D32F2F; }
+        .pt-safe-top { padding-top: env(safe-area-inset-top, 20px); }
+        .pb-safe-bottom { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+
+      <Snowfall />
+
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[#FFFEFA]/95 backdrop-blur-md pt-safe-top border-b border-[#F0E0E0]">
+        <div className="max-w-md mx-auto h-20 flex items-center justify-between px-6 relative">
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-serif font-bold text-[#D32F2F] tracking-widest">冬の東北</h1>
+            <span className="text-[10px] text-slate-400 tracking-[0.2em] uppercase font-bold mt-1">Winter Trip 2025</span>
+          </div>
+          
+          <WeatherBadge 
+            type={displayWeather.weather} 
+            temp={displayWeather.temp} 
+            location={displayWeather.location.split('/')[0]} 
+          />
+        </div>
+      </header>
+
+      {/* Body */}
+      <main className="max-w-md mx-auto pt-28 px-4 min-h-screen relative z-10">
+        {activeTab === 'itinerary' && <ItineraryView onExpand={setModalData} />}
+        {activeTab === 'shopping' && <ShoppingView />}
+        {activeTab === 'tools' && <ToolsView />}
+      </main>
+
+      {/* Modal */}
+      {modalData && <DetailModal day={modalData} onClose={() => setModalData(null)} />}
+
+      {/* Nav */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-[#FFFEFA]/95 backdrop-blur-lg border-t border-[#F0E0E0] z-40 pb-safe-bottom">
+        <div className="max-w-md mx-auto flex justify-around items-center h-20">
+          <NavBtn icon={Navigation} label="行程" active={activeTab==='itinerary'} onClick={()=>setActiveTab('itinerary')} />
+          <NavBtn icon={ShoppingCart} label="購物" active={activeTab==='shopping'} onClick={()=>setActiveTab('shopping')} />
+          <NavBtn icon={Briefcase} label="工具" active={activeTab==='tools'} onClick={()=>setActiveTab('tools')} />
+        </div>
+      </nav>
+
+    </div>
+  );
+}
+
+const NavBtn = ({ icon: Icon, label, active, onClick }) => (
+  <button onClick={onClick} className={`flex flex-col items-center gap-1 w-16 transition-all duration-300 ${active ? 'text-[#D32F2F]' : 'text-slate-300'}`}>
+    <div className={`p-1 transition-all ${active ? '-translate-y-1' : ''}`}>
+       <Icon size={24} strokeWidth={1.5} />
+    </div>
+    <span className="text-[10px] font-serif font-bold tracking-widest">{label}</span>
+  </button>
+);
