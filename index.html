@@ -40,7 +40,7 @@
     @keyframes fall { 0% { transform: translateY(-10vh) translateX(0); } 100% { transform: translateY(100vh) translateX(20px); } }
     .animate-fall { animation-timing-function: linear; animation-iteration-count: infinite; }
     
-    .tool-tab { display:flex; align-items:center; gap:8px; padding:10px 20px; font-size:12px; font-weight:bold; letter-spacing: 0.05em; white-space:nowrap; transition:all 0.3s; background:transparent; color:#94a3b8; border-bottom:2px solid transparent; font-family: 'Noto Serif TC', serif; }
+    .tool-tab { display:flex; align-items:center; gap:6px; padding:8px 16px; font-size:12px; font-weight:bold; letter-spacing: 0.05em; white-space:nowrap; transition:all 0.3s; background:transparent; color:#94a3b8; border-bottom:2px solid transparent; font-family: 'Noto Serif TC', serif; }
     .tool-tab.active { color:#D32F2F; border-color:#D32F2F; }
     
     .pt-safe-top { padding-top: env(safe-area-inset-top, 20px); }
@@ -54,19 +54,16 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useRef } = React;
     
-    // --- Lucide Icon Wrapper ---
-    // 這個元件負責將 React 的圖示名稱轉換為 Lucide 的 SVG
+    // Lucide Icon Wrapper
     const LucideIcon = ({ name, size = 24, className = "", strokeWidth = 2, color, style }) => {
-       const ref = React.useRef(null);
+       const ref = useRef(null);
        useEffect(() => {
          if(ref.current && window.lucide) {
             ref.current.innerHTML = '';
             const i = document.createElement('i');
             i.setAttribute('data-lucide', name);
-            
-            // 合併樣式與 Class
             if (className) i.className = className;
             i.style.width = size + 'px';
             i.style.height = size + 'px';
@@ -87,8 +84,7 @@
        return <span ref={ref} style={{display:'inline-flex', verticalAlign:'middle', ...style}} />;
     };
 
-    // --- Icon Components Definitions ---
-    // 為了讓原本的程式碼 (如 <Plane />) 可以直接運作，我們在這裡定義所有用到的圖示元件
+    // --- Icon Components ---
     const Plane = (props) => <LucideIcon name="plane" {...props} />;
     const MapPin = (props) => <LucideIcon name="map-pin" {...props} />;
     const Utensils = (props) => <LucideIcon name="utensils" {...props} />;
@@ -118,9 +114,10 @@
     const ExternalLink = (props) => <LucideIcon name="external-link" {...props} />;
     const Search = (props) => <LucideIcon name="search" {...props} />;
     const Star = (props) => <LucideIcon name="star" {...props} />;
+    const Coins = (props) => <LucideIcon name="coins" {...props} />;
+    const ArrowDownUp = (props) => <LucideIcon name="arrow-down-up" {...props} />;
 
-    // --- Data & Configuration ---
-
+    // --- Data ---
     const itineraryData = [
       {
         day: 1,
@@ -472,7 +469,7 @@
           <div 
             key={day.day}
             onClick={() => onExpand(day)}
-            className="bg-white/80 backdrop-blur-md rounded-none p-6 border-l-4 border-[#D32F2F] shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden active:bg-[#FFF5F5] transition-colors cursor-pointer group hover:shadow-md"
+            className="bg-white/80 backdrop-blur-md rounded-none p-6 border-l-4 border-[#D32F2F] shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden active:bg-[#FFF5F5] transition-colors cursor-pointer group hover:shadow-md mb-6"
           >
             <div className="flex justify-between items-start relative z-10">
               <div className="flex-1">
@@ -589,6 +586,112 @@
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- Currency Converter Component ---
+    const CurrencyConverter = () => {
+      const [rate, setRate] = useState(0.22); // Default rough rate
+      const [jpy, setJpy] = useState('');
+      const [twd, setTwd] = useState('');
+
+      useEffect(() => {
+        const savedRate = localStorage.getItem('tohoku_rate');
+        if (savedRate) setRate(parseFloat(savedRate));
+      }, []);
+
+      const handleRateChange = (e) => {
+        const newRate = parseFloat(e.target.value);
+        setRate(newRate);
+        localStorage.setItem('tohoku_rate', newRate);
+        if (jpy) setTwd(Math.round(parseFloat(jpy) * newRate));
+        else if (twd) setJpy(Math.round(parseFloat(twd) / newRate));
+      };
+
+      const handleJpyChange = (e) => {
+        const val = e.target.value;
+        setJpy(val);
+        if (val && rate) {
+          setTwd(Math.round(parseFloat(val) * rate));
+        } else {
+          setTwd('');
+        }
+      };
+
+      const handleTwdChange = (e) => {
+        const val = e.target.value;
+        setTwd(val);
+        if (val && rate) {
+          setJpy(Math.round(parseFloat(val) / rate));
+        } else {
+          setJpy('');
+        }
+      };
+
+      return (
+        <div className="animate-fadeIn px-4">
+          <div className="bg-white p-6 rounded-none border border-slate-200 shadow-sm">
+            <h3 className="font-serif font-bold text-slate-800 mb-6 flex items-center gap-2 text-lg">
+              <Coins className="text-[#D32F2F]" /> 
+              即時匯率換算
+            </h3>
+            
+            {/* Rate Input */}
+            <div className="mb-6 flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200">
+               <span className="text-xs font-bold text-slate-500">目前匯率 (JPY → TWD)</span>
+               <div className="flex items-center gap-2">
+                 <input 
+                   type="number" 
+                   value={rate} 
+                   onChange={handleRateChange}
+                   step="0.001"
+                   className="w-20 text-right bg-white border border-slate-300 rounded px-2 py-1 text-sm font-serif font-bold text-slate-700 focus:outline-none focus:border-[#D32F2F]"
+                 />
+               </div>
+            </div>
+
+            {/* Converter Inputs */}
+            <div className="space-y-4">
+              <div className="relative">
+                <label className="absolute -top-2.5 left-3 bg-white px-1 text-[10px] font-bold text-slate-400">JPY (日幣)</label>
+                <div className="flex items-center border border-slate-300 rounded-xl px-4 py-3 focus-within:border-[#D32F2F] focus-within:ring-1 focus-within:ring-[#D32F2F] transition-all">
+                  <span className="text-lg font-bold text-slate-400 mr-2">¥</span>
+                  <input 
+                    type="number" 
+                    value={jpy} 
+                    onChange={handleJpyChange}
+                    placeholder="0" 
+                    className="w-full text-2xl font-serif font-bold text-slate-800 outline-none placeholder:text-slate-200"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-center -my-3 relative z-10">
+                <div className="bg-white p-2 rounded-full border border-slate-200 shadow-sm text-[#D32F2F]">
+                  <ArrowDownUp size={16} />
+                </div>
+              </div>
+
+              <div className="relative">
+                <label className="absolute -top-2.5 left-3 bg-white px-1 text-[10px] font-bold text-slate-400">TWD (台幣)</label>
+                <div className="flex items-center border border-slate-300 rounded-xl px-4 py-3 focus-within:border-[#D32F2F] focus-within:ring-1 focus-within:ring-[#D32F2F] transition-all bg-slate-50">
+                  <span className="text-lg font-bold text-slate-400 mr-2">$</span>
+                  <input 
+                    type="number" 
+                    value={twd} 
+                    onChange={handleTwdChange}
+                    placeholder="0" 
+                    className="w-full text-2xl font-serif font-bold text-slate-800 outline-none bg-transparent placeholder:text-slate-200"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-[10px] text-slate-400 mt-4 text-center tracking-wider">
+              * 匯率僅供參考，實際請以銀行或換匯店為準。
+            </p>
           </div>
         </div>
       );
@@ -770,6 +873,7 @@
            <div className="flex justify-center gap-2 mb-8 px-4 overflow-x-auto pb-2 scrollbar-hide">
              <button onClick={()=>setActiveTool('phrase')} className={`tool-tab ${activeTool==='phrase'?'active':''}`}><MessageCircle size={16}/> 指指通</button>
              <button onClick={()=>setActiveTool('pack')} className={`tool-tab ${activeTool==='pack'?'active':''}`}><CheckSquare size={16}/> 清單</button>
+             <button onClick={()=>setActiveTool('rate')} className={`tool-tab ${activeTool==='rate'?'active':''}`}><Coins size={16}/> 匯率</button>
              <button onClick={()=>setActiveTool('info')} className={`tool-tab ${activeTool==='info'?'active':''}`}><Info size={16}/> 資訊</button>
            </div>
 
@@ -790,6 +894,7 @@
                 <CheckListSection title="託運行李" color="emerald" listKey="luggage" />
              </div>
            )}
+           {activeTool === 'rate' && <CurrencyConverter />}
            {activeTool === 'info' && (
              <div className="space-y-6 animate-fadeIn px-4">
                 <div className="bg-white p-6 rounded-none border border-slate-200 shadow-[4px_4px_0px_rgba(0,0,0,0.05)]">
@@ -857,8 +962,6 @@
             .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
           `}</style>
 
-          <Snowfall />
-
           <header className="fixed top-0 left-0 right-0 z-40 bg-[#FFFEFA]/95 backdrop-blur-md pt-safe-top border-b border-[#F0E0E0]">
             <div className="max-w-md mx-auto h-20 flex items-center justify-between px-6 relative">
               <div className="flex flex-col">
@@ -897,5 +1000,3 @@
   </script>
 </body>
 </html>
-
-
