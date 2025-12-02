@@ -116,6 +116,7 @@
     const Star = (props) => <LucideIcon name="star" {...props} />;
     const Coins = (props) => <LucideIcon name="coins" {...props} />;
     const ArrowDownUp = (props) => <LucideIcon name="arrow-down-up" {...props} />;
+    const X = (props) => <LucideIcon name="x" {...props} />;
 
     // --- Data ---
     const itineraryData = [
@@ -705,12 +706,16 @@
       const [giftWho, setGiftWho] = useState('');
       const [giftItem, setGiftItem] = useState('');
       const [subTab, setSubTab] = useState('wallet');
+      const [rate, setRate] = useState(0.22);
 
       useEffect(() => {
         const savedExp = localStorage.getItem('tohoku_v5_expenses');
         const savedGift = localStorage.getItem('tohoku_v5_gifts');
+        const savedRate = localStorage.getItem('tohoku_rate');
+        
         if (savedExp) setItems(JSON.parse(savedExp));
         if (savedGift) setGifts(JSON.parse(savedGift));
+        if (savedRate) setRate(parseFloat(savedRate));
       }, []);
 
       useEffect(() => {
@@ -764,6 +769,9 @@
                  <div className="text-5xl font-serif font-bold text-slate-800 tracking-tighter">
                    <span className="text-2xl mr-2 font-light text-slate-400">¥</span>{total.toLocaleString()}
                  </div>
+                 <div className="text-sm text-slate-400 mt-1 font-sans">
+                   ≈ NT$ {Math.round(total * rate).toLocaleString()}
+                 </div>
               </div>
               
               <form onSubmit={addExpense} className="flex gap-3 mb-6 px-4">
@@ -776,8 +784,11 @@
                 {items.map(i => (
                   <div key={i.id} className="bg-white py-4 border-b border-slate-100 flex justify-between items-center">
                     <span className="text-slate-700 font-serif font-medium text-lg">{i.desc}</span>
-                    <div className="flex items-center gap-4">
-                      <span className="font-serif font-bold text-slate-800 text-lg">¥ {i.amount.toLocaleString()}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col items-end mr-2">
+                        <span className="font-serif font-bold text-slate-800 text-lg">¥ {i.amount.toLocaleString()}</span>
+                        <span className="text-[10px] text-slate-400 font-sans">≈ NT$ {Math.round(i.amount * rate).toLocaleString()}</span>
+                      </div>
                       <Trash2 size={16} className="text-slate-300 cursor-pointer hover:text-[#D32F2F] transition-colors" onClick={() => setItems(items.filter(x => x.id !== i.id))} />
                     </div>
                   </div>
@@ -820,21 +831,38 @@
 
     const CheckListSection = ({ title, color, listKey }) => {
       const [items, setItems] = useState([]);
+      const [newItem, setNewItem] = useState(''); // State for new item input
       const defaultItems = listKey === 'carryon' 
         ? ["發熱衣", "防風外套", "圍巾/手套", "毛帽", "防滑靴", "護唇膏", "行動電源"]
         : ["常備藥", "乳液", "牙刷牙膏", "轉接頭", "充電器", "壓縮袋", "大購物袋"];
 
       useEffect(() => {
-        const saved = localStorage.getItem(`tohoku_v5_${listKey}`);
+        const saved = localStorage.getItem(`tohoku_v6_${listKey}`); // V6 storage key
         if (saved) setItems(JSON.parse(saved));
         else setItems(defaultItems.map((txt, i) => ({ id: i, text: txt, checked: false })));
       }, []);
 
+      const updateStorage = (newItems) => {
+        setItems(newItems);
+        localStorage.setItem(`tohoku_v6_${listKey}`, JSON.stringify(newItems));
+      };
+
       const toggle = (id) => {
         const newItems = items.map(i => i.id === id ? { ...i, checked: !i.checked } : i);
-        setItems(newItems);
-        localStorage.setItem(`tohoku_v5_${listKey}`, JSON.stringify(newItems));
-      }
+        updateStorage(newItems);
+      };
+
+      const addItem = (e) => {
+        e.preventDefault();
+        if (!newItem.trim()) return;
+        const newEntry = { id: Date.now(), text: newItem, checked: false };
+        updateStorage([...items, newEntry]);
+        setNewItem('');
+      };
+
+      const removeItem = (id) => {
+        updateStorage(items.filter(i => i.id !== id));
+      };
 
       return (
         <div className="bg-white p-6 rounded-none border border-slate-200">
@@ -842,16 +870,29 @@
             <div className={`w-2 h-2 rounded-full ${color === 'rose' ? 'bg-[#D32F2F]' : 'bg-emerald-700'}`}></div>
             {title}
           </h3>
-          <div className="space-y-3">
+          
+          <div className="space-y-3 mb-4">
             {items.map(item => (
-              <div key={item.id} onClick={() => toggle(item.id)} className="flex items-center gap-4 cursor-pointer group">
-                <div className={`w-5 h-5 border flex items-center justify-center transition-colors ${item.checked ? (color==='rose'?'bg-[#D32F2F] border-[#D32F2F]':'bg-emerald-700 border-emerald-700') : 'border-slate-300 group-hover:border-slate-400'}`}>
+              <div key={item.id} className="flex items-center gap-3 group">
+                <div onClick={() => toggle(item.id)} className={`w-5 h-5 border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${item.checked ? (color==='rose'?'bg-[#D32F2F] border-[#D32F2F]':'bg-emerald-700 border-emerald-700') : 'border-slate-300 group-hover:border-slate-400'}`}>
                   {item.checked && <CheckSquare size={12} className="text-white"/>}
                 </div>
-                <span className={`text-sm font-serif ${item.checked ? 'text-slate-300 line-through decoration-slate-300' : 'text-slate-700'}`}>{item.text}</span>
+                <span onClick={() => toggle(item.id)} className={`flex-1 text-sm font-serif cursor-pointer ${item.checked ? 'text-slate-300 line-through decoration-slate-300' : 'text-slate-700'}`}>{item.text}</span>
+                <button onClick={() => removeItem(item.id)} className="text-slate-200 hover:text-red-400 p-1"><X size={14}/></button>
               </div>
             ))}
           </div>
+
+          <form onSubmit={addItem} className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
+            <input 
+              type="text" 
+              value={newItem} 
+              onChange={(e) => setNewItem(e.target.value)} 
+              placeholder="新增項目..." 
+              className="flex-1 bg-slate-50 border border-slate-200 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-slate-400"
+            />
+            <button type="submit" className="text-slate-400 hover:text-[#D32F2F]"><Plus size={20}/></button>
+          </form>
         </div>
       )
     }
@@ -868,6 +909,14 @@
         { jp: "免税できますか", en: "Men-zei De-ki-ma-su-ka", ch: "可以退稅嗎？" },
       ];
 
+      // Expanded Phrase List for "Eat" category (example)
+      const eatPhrases = [
+        { jp: "お水ください", en: "O-mi-zu Ku-da-sai", ch: "請給我水" },
+        { jp: "お会計お願いします", en: "O-kai-kei O-ne-gai", ch: "麻煩結帳" },
+        { jp: "ネギ抜きで", en: "Ne-gi Nu-ki De", ch: "不要蔥" },
+        { jp: "おすすめは？", en: "O-su-su-me Wa?", ch: "推薦什麼？" },
+      ];
+
       return (
         <div className="pb-24">
            <div className="flex justify-center gap-2 mb-8 px-4 overflow-x-auto pb-2 scrollbar-hide">
@@ -878,14 +927,31 @@
            </div>
 
            {activeTool === 'phrase' && (
-             <div className="grid grid-cols-2 gap-4 animate-fadeIn px-4">
-                {phrases.map((p, i) => (
-                  <div key={i} className="bg-white p-6 rounded-none border border-slate-200 flex flex-col items-center text-center active:scale-95 transition-transform cursor-pointer hover:shadow-md">
-                    <div className="text-xl font-serif font-bold text-slate-800 mb-2">{p.jp}</div>
-                    <div className="text-[10px] text-[#D32F2F] font-bold tracking-widest uppercase mb-3">{p.en}</div>
-                    <div className="text-sm font-medium text-slate-500 font-serif">{p.ch}</div>
-                  </div>
-                ))}
+             <div className="space-y-6 px-4 animate-fadeIn">
+               <div>
+                 <h4 className="text-xs font-bold text-slate-400 mb-3 tracking-widest">基本用語</h4>
+                 <div className="grid grid-cols-2 gap-3">
+                    {phrases.map((p, i) => (
+                      <div key={i} className="bg-white p-4 rounded-none border border-slate-200 flex flex-col items-center text-center active:scale-95 transition-transform cursor-pointer shadow-sm">
+                        <div className="text-lg font-serif font-bold text-slate-800 mb-1">{p.jp}</div>
+                        <div className="text-[10px] text-[#D32F2F] font-bold tracking-widest uppercase mb-2">{p.en}</div>
+                        <div className="text-sm font-medium text-slate-500 font-serif">{p.ch}</div>
+                      </div>
+                    ))}
+                 </div>
+               </div>
+               <div>
+                 <h4 className="text-xs font-bold text-slate-400 mb-3 tracking-widest">用餐 / 點餐</h4>
+                 <div className="grid grid-cols-2 gap-3">
+                    {eatPhrases.map((p, i) => (
+                      <div key={i} className="bg-white p-4 rounded-none border border-slate-200 flex flex-col items-center text-center active:scale-95 transition-transform cursor-pointer shadow-sm">
+                        <div className="text-lg font-serif font-bold text-slate-800 mb-1">{p.jp}</div>
+                        <div className="text-[10px] text-[#D32F2F] font-bold tracking-widest uppercase mb-2">{p.en}</div>
+                        <div className="text-sm font-medium text-slate-500 font-serif">{p.ch}</div>
+                      </div>
+                    ))}
+                 </div>
+               </div>
              </div>
            )}
            {activeTool === 'pack' && (
@@ -895,6 +961,7 @@
              </div>
            )}
            {activeTool === 'rate' && <CurrencyConverter />}
+           
            {activeTool === 'info' && (
              <div className="space-y-6 animate-fadeIn px-4">
                 <div className="bg-white p-6 rounded-none border border-slate-200 shadow-[4px_4px_0px_rgba(0,0,0,0.05)]">
@@ -945,22 +1012,7 @@
 
       return (
         <div className="min-h-screen bg-[#FFFEFA] font-serif text-slate-800 relative selection:bg-[#FFEBEE] selection:text-[#D32F2F]">
-          <style>{`
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&display=swap');
-            @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&display=swap');
-            .font-serif { font-family: 'Shippori Mincho', 'Noto Serif TC', serif; }
-            .font-sans { font-family: sans-serif; }
-            .scrollbar-hide::-webkit-scrollbar { display: none; }
-            @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-            .animate-slideUp { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-            .animate-fall { animation-timing-function: linear; animation-iteration-count: infinite; }
-            .tool-tab { display:flex; align-items:center; gap:8px; padding:10px 20px; font-size:12px; font-weight:bold; letter-spacing: 0.05em; white-space:nowrap; transition:all 0.3s; background:transparent; color:#94a3b8; border-bottom:2px solid transparent; font-family: 'Noto Serif TC', serif; }
-            .tool-tab.active { color:#D32F2F; border-color:#D32F2F; }
-            .pt-safe-top { padding-top: env(safe-area-inset-top, 20px); }
-            .pb-safe-bottom { padding-bottom: env(safe-area-inset-bottom, 20px); }
-            .no-scrollbar::-webkit-scrollbar { display: none; }
-            .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-          `}</style>
+          <Snowfall />
 
           <header className="fixed top-0 left-0 right-0 z-40 bg-[#FFFEFA]/95 backdrop-blur-md pt-safe-top border-b border-[#F0E0E0]">
             <div className="max-w-md mx-auto h-20 flex items-center justify-between px-6 relative">
@@ -968,11 +1020,14 @@
                 <h1 className="text-2xl font-serif font-bold text-[#D32F2F] tracking-widest">冬の東北</h1>
                 <span className="text-[10px] text-slate-400 tracking-[0.2em] uppercase font-bold mt-1">Winter Trip 2025</span>
               </div>
-              <WeatherBadge 
-                type={displayWeather.weather} 
-                temp={displayWeather.temp} 
-                location={displayWeather.location.split('/')[0]} 
-              />
+              
+              <div className="absolute right-6 top-1/2 -translate-y-1/2">
+                <WeatherBadge 
+                  type={displayWeather.weather} 
+                  temp={displayWeather.temp} 
+                  location={displayWeather.location.split('/')[0]} 
+                />
+              </div>
             </div>
           </header>
 
