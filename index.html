@@ -15,7 +15,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
 
   <!-- React & ReactDOM & Babel -->
@@ -28,9 +30,17 @@
 
   <style>
     /* Custom Styles */
-    body { background-color: #FFFEFA; }
-    .font-serif { font-family: 'Shippori Mincho', 'Noto Serif TC', serif; }
-    .font-sans { font-family: sans-serif; }
+    body { 
+      background-color: #FFFEFA; 
+      font-family: 'Noto Serif TC', 'Shippori Mincho', serif; /* 強制全域使用思源宋體 */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* 確保特定 class 也優先使用思源宋體 */
+    .font-serif { font-family: 'Noto Serif TC', 'Shippori Mincho', serif; }
+    .font-sans { font-family: 'Noto Serif TC', sans-serif; } 
+    
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     
@@ -40,7 +50,21 @@
     @keyframes fall { 0% { transform: translateY(-10vh) translateX(0); } 100% { transform: translateY(100vh) translateX(20px); } }
     .animate-fall { animation-timing-function: linear; animation-iteration-count: infinite; }
     
-    .tool-tab { display:flex; align-items:center; gap:6px; padding:8px 16px; font-size:12px; font-weight:bold; letter-spacing: 0.05em; white-space:nowrap; transition:all 0.3s; background:transparent; color:#94a3b8; border-bottom:2px solid transparent; font-family: 'Noto Serif TC', serif; }
+    .tool-tab { 
+      display:flex; 
+      align-items:center; 
+      gap:6px; 
+      padding:8px 16px; 
+      font-size:12px; 
+      font-weight:bold; 
+      letter-spacing: 0.05em; 
+      white-space:nowrap; 
+      transition:all 0.3s; 
+      background:transparent; 
+      color:#94a3b8; 
+      border-bottom:2px solid transparent; 
+      font-family: 'Noto Serif TC', serif; 
+    }
     .tool-tab.active { color:#D32F2F; border-color:#D32F2F; }
     
     .pt-safe-top { padding-top: env(safe-area-inset-top, 20px); }
@@ -116,6 +140,7 @@
     const Star = (props) => <LucideIcon name="star" {...props} />;
     const Coins = (props) => <LucideIcon name="coins" {...props} />;
     const ArrowDownUp = (props) => <LucideIcon name="arrow-down-up" {...props} />;
+    const Copy = (props) => <LucideIcon name="copy" {...props} />;
     const X = (props) => <LucideIcon name="x" {...props} />;
 
     // --- Data ---
@@ -789,7 +814,7 @@
                         <span className="font-serif font-bold text-slate-800 text-lg">¥ {i.amount.toLocaleString()}</span>
                         <span className="text-[10px] text-slate-400 font-sans">≈ NT$ {Math.round(i.amount * rate).toLocaleString()}</span>
                       </div>
-                      <Trash2 size={16} className="text-slate-300 cursor-pointer hover:text-[#D32F2F] transition-colors" onClick={() => setItems(items.filter(x => x.id !== i.id))} />
+                      <button type="button" className="text-slate-300 cursor-pointer hover:text-[#D32F2F] transition-colors p-2" onClick={() => setItems(items.filter(x => x.id !== i.id))}><Trash2 size={16}/></button>
                     </div>
                   </div>
                 ))}
