@@ -17,8 +17,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
 
   <!-- React & ReactDOM & Babel -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
@@ -142,6 +141,7 @@
     const ArrowDownUp = (props) => <LucideIcon name="arrow-down-up" {...props} />;
     const Copy = (props) => <LucideIcon name="copy" {...props} />;
     const X = (props) => <LucideIcon name="x" {...props} />;
+    const ChevronRight = (props) => <LucideIcon name="chevron-right" {...props} />;
 
     // --- Data ---
     const itineraryData = [
@@ -154,7 +154,6 @@
         tag: "出發",
         hotel: "Hotel View Kuroda 天童黑田飯店",
         hotelTel: "+81-23-654-1515",
-        hotelAddrJP: "〒994-0024 山形県天童市鎌田1-3-11",
         conbini: {
           stores: [
             { name: "Daily Yamazaki", type: "daily", dist: "3 min" },
@@ -190,7 +189,6 @@
         tag: "浪漫",
         hotel: "Listel Inawashiro Hotel 豬苗代",
         hotelTel: "+81-24-266-2233",
-        hotelAddrJP: "〒969-2696 福島県耶麻郡猪苗代町大字川桁リステルパーク",
         conbini: {
           stores: [
             { name: "Hotel Shop", type: "shop", dist: "1F" }
@@ -227,7 +225,6 @@
         tag: "歷史",
         hotel: "Listel Inawashiro Hotel 豬苗代",
         hotelTel: "+81-24-266-2233",
-        hotelAddrJP: "〒969-2696 福島県耶麻郡猪苗代町大字川桁リステルパーク",
         conbini: {
           stores: [{ name: "Hotel Shop", type: "shop", dist: "1F" }],
           warning: "最近超商需車程 10 分鐘",
@@ -262,7 +259,6 @@
         tag: "都會",
         hotel: "Hotel Keihan Sendai 京阪仙台",
         hotelTel: "022-263-0321",
-        hotelAddrJP: "〒980-0021 宮城県仙台市青葉区中央3-3-5",
         conbini: {
           stores: [
             { name: "FamilyMart", type: "family", dist: "2 min" },
@@ -487,9 +483,10 @@
       );
     };
 
+    // Vertical List Itinerary View
     const ItineraryView = ({ onExpand }) => (
-      <div className="space-y-6 pb-28">
-        <div className="flex items-center justify-center gap-3 mb-8 px-2 relative">
+      <div className="space-y-6 px-4 pb-28">
+        <div className="flex items-center justify-center gap-3 mb-8 relative">
           <div className="h-[1px] w-10 bg-slate-300"></div>
           <h2 className="text-2xl font-serif font-bold text-slate-800 tracking-widest text-center">旅の行程</h2>
           <div className="h-[1px] w-10 bg-slate-300"></div>
@@ -499,12 +496,12 @@
           <div 
             key={day.day}
             onClick={() => onExpand(day)}
-            className="bg-white/80 backdrop-blur-md rounded-none p-6 border-l-4 border-[#D32F2F] shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden active:bg-[#FFF5F5] transition-colors cursor-pointer group hover:shadow-md mb-6"
+            className="bg-white rounded-xl p-6 border-l-4 border-[#D32F2F] shadow-sm relative overflow-hidden active:bg-slate-50 transition-colors cursor-pointer group hover:shadow-md"
           >
             <div className="flex justify-between items-start relative z-10">
               <div className="flex-1">
-                <div className="flex items-baseline gap-4 mb-3">
-                  <div className="flex flex-col items-center">
+                <div className="flex items-baseline gap-4 mb-2">
+                  <div className="flex flex-col items-center min-w-[3rem]">
                      <span className="text-3xl font-serif font-bold text-[#D32F2F] leading-none">{day.date.split('/')[1].split(' ')[0]}</span>
                      <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Dec</span>
                   </div>
@@ -518,6 +515,11 @@
                  <LucideIcon name={day.weather === 'sun' ? 'sun' : day.weather === 'cloudy' ? 'cloud-rain' : 'cloud-snow'} size={20} className="text-slate-400" strokeWidth={1.5} />
                  <span className="text-xs font-serif mt-1 text-slate-500">{day.temp}</span>
               </div>
+            </div>
+            <div className="mt-3 flex justify-end">
+               <span className="text-xs text-slate-300 group-hover:text-[#D32F2F] transition-colors flex items-center gap-0.5">
+                  <LucideIcon name="chevron-right" size={14}/>
+               </span>
             </div>
           </div>
         ))}
@@ -757,11 +759,10 @@
       const addExpense = (e) => {
         e.preventDefault();
         if (!desc || !amount) return;
-        setItems([{ id: Date.now(), desc, amount: parseFloat(amount) }, ...items]);
+        setItems(prev => [{ id: Date.now(), desc, amount: parseFloat(amount) }, ...prev]);
         setDesc(''); setAmount('');
       };
 
-      // Helper to robustly remove item
       const removeExpense = (id) => {
         setItems(prevItems => prevItems.filter(item => item.id !== id));
       };
@@ -769,12 +770,16 @@
       const addGift = (e) => {
         e.preventDefault();
         if (!giftWho || !giftItem) return;
-        setGifts([{ id: Date.now(), who: giftWho, item: giftItem, bought: false }, ...gifts]);
+        setGifts(prev => [{ id: Date.now(), who: giftWho, item: giftItem, bought: false }, ...prev]);
         setGiftWho(''); setGiftItem('');
       };
 
+      const removeGift = (id) => {
+        setGifts(prev => prev.filter(item => item.id !== id));
+      };
+
       const toggleGift = (id) => {
-        setGifts(gifts.map(g => g.id === id ? { ...g, bought: !g.bought } : g));
+        setGifts(prev => prev.map(g => g.id === id ? { ...g, bought: !g.bought } : g));
       };
 
       const total = items.reduce((acc, cur) => acc + cur.amount, 0);
@@ -811,7 +816,7 @@
               <form onSubmit={addExpense} className="flex gap-3 mb-6 px-4">
                  <input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Item Name" className="flex-1 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
                  <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="¥" className="w-24 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
-                 <button type="submit" className="text-[#D32F2F] hover:bg-red-50 rounded-full w-10 h-10 flex items-center justify-center transition-colors"><Plus/></button>
+                 <button type="submit" className="text-[#D32F2F] hover:bg-red-50 rounded-full w-10 h-10 flex items-center justify-center transition-colors"><Plus size={24}/></button>
               </form>
 
               <div className="space-y-0 px-4">
@@ -853,14 +858,14 @@
                <div className="space-y-3">
                  {gifts.map(g => (
                    <div key={g.id} onClick={() => toggleGift(g.id)} className={`p-5 rounded-lg border cursor-pointer transition-all flex items-center gap-4 ${g.bought ? 'bg-slate-50 border-transparent opacity-60' : 'bg-white border-slate-200 shadow-sm hover:border-[#D32F2F]'}`}>
-                     <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${g.bought ? 'bg-[#D32F2F] border-[#D32F2F]' : 'border-slate-300'}`}>
+                     <div onClick={() => toggleGift(g.id)} className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${g.bought ? 'bg-[#D32F2F] border-[#D32F2F]' : 'border-slate-300'}`}>
                        {g.bought && <CheckSquare size={14} className="text-white" />}
                      </div>
-                     <div className="flex-1">
+                     <div className="flex-1" onClick={() => toggleGift(g.id)}>
                        <div className={`font-serif font-bold text-lg ${g.bought ? 'line-through text-slate-400' : 'text-slate-800'}`}>{g.who}</div>
                        <div className="text-sm text-slate-500 font-serif italic">{g.item}</div>
                      </div>
-                     {g.bought && <span className="text-[10px] text-[#D32F2F] font-bold tracking-widest border border-[#D32F2F] px-2 py-1">BOUGHT</span>}
+                     <button onClick={() => removeGift(g.id)} className="text-slate-300 hover:text-[#D32F2F] p-2"><Trash2 size={18}/></button>
                    </div>
                  ))}
                  {gifts.length === 0 && <div className="text-center text-slate-300 py-12 text-sm font-serif italic">List is empty.</div>}
