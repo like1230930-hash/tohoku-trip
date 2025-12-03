@@ -9,7 +9,7 @@
   
   <!-- PWA Icons -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❄️</text></svg>">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23D32F2F%22/><text x=%2250%22 y=%2250%22 font-size=%2250%22 text-anchor=%22middle%22 dy=%22.35em%22>東北</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23D32F2F%22/><text x=%2250%22 y=%2255%22 font-size=%2270%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22%23000000%22 font-weight=%22bold%22>冬</text></svg>">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -31,12 +31,11 @@
     /* Custom Styles */
     body { 
       background-color: #FFFEFA; 
-      font-family: 'Noto Serif TC', 'Shippori Mincho', serif; /* 強制全域使用思源宋體 */
+      font-family: 'Noto Serif TC', 'Shippori Mincho', serif; 
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
     
-    /* 確保特定 class 也優先使用思源宋體 */
     .font-serif { font-family: 'Noto Serif TC', 'Shippori Mincho', serif; }
     .font-sans { font-family: 'Noto Serif TC', sans-serif; } 
     
@@ -79,7 +78,7 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
     
-    // Lucide Icon Wrapper
+    // --- Lucide Icon Wrapper ---
     const LucideIcon = ({ name, size = 24, className = "", strokeWidth = 2, color, style }) => {
        const ref = useRef(null);
        useEffect(() => {
@@ -107,7 +106,7 @@
        return <span ref={ref} style={{display:'inline-flex', verticalAlign:'middle', ...style}} />;
     };
 
-    // --- Icon Components ---
+    // --- Icon Definitions ---
     const Plane = (props) => <LucideIcon name="plane" {...props} />;
     const MapPin = (props) => <LucideIcon name="map-pin" {...props} />;
     const Utensils = (props) => <LucideIcon name="utensils" {...props} />;
@@ -142,6 +141,7 @@
     const Copy = (props) => <LucideIcon name="copy" {...props} />;
     const X = (props) => <LucideIcon name="x" {...props} />;
     const ChevronRight = (props) => <LucideIcon name="chevron-right" {...props} />;
+    const Ticket = (props) => <LucideIcon name="ticket" {...props} />;
 
     // --- Data ---
     const itineraryData = [
@@ -161,6 +161,23 @@
           ],
           searchQuery: "convenience store near Hotel View Kuroda Tendo",
           link: "https://www.google.com/maps/search/convenience+store+near+Hotel+View+Kuroda+Tendo"
+        },
+        // Flight Data for Day 1
+        flight: {
+          type: "去程",
+          date: "12/06",
+          airline: "STARLUX",
+          code: "JX862",
+          from: "TPE",
+          fromCity: "台北 (桃園)",
+          to: "SDJ",
+          toCity: "仙台",
+          depTime: "11:50",
+          arrTime: "16:00",
+          duration: "3h 10m",
+          gate: "6",
+          seat: "團體",
+          class: "Economy"
         },
         intro: "旅程的起點。飛往北國雪境，晚間享用迎賓會席料理。",
         recommends: {
@@ -292,6 +309,23 @@
         temp: "3°C",
         tag: "歸途",
         hotel: "溫暖的家",
+        // Flight Data for Day 5
+        flight: {
+          type: "回程",
+          date: "12/10",
+          airline: "STARLUX",
+          code: "JX863",
+          from: "SDJ",
+          fromCity: "仙台",
+          to: "TPE",
+          toCity: "台北 (桃園)",
+          depTime: "17:15",
+          arrTime: "20:35",
+          duration: "4h 20m",
+          gate: "--",
+          seat: "團體",
+          class: "Economy"
+        },
         intro: "旅程最終章，在松島留下美好回憶，帶著滿滿戰利品回家。",
         recommends: {
           eat: [
@@ -373,7 +407,7 @@
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
                <div className="relative">
                  <div className="w-4 h-4 bg-blue-500/20 rounded-full animate-ping absolute"></div>
-                 <MapPin size={32} className="text-blue-600 fill-white drop-shadow-md" />
+                 <LucideIcon name="map-pin" size={32} className="text-blue-600 fill-white drop-shadow-md" />
                </div>
             </div>
 
@@ -383,7 +417,7 @@
                return (
                  <div key={idx} className="absolute z-0 transform hover:scale-110 transition-transform" style={pos}>
                     <div className="flex flex-col items-center">
-                       <Store size={24} className={`${getPinColor(store.type)} fill-white drop-shadow-sm`} />
+                       <LucideIcon name="store" size={24} className={`${getPinColor(store.type)} fill-white drop-shadow-sm`} />
                     </div>
                  </div>
                )
@@ -396,7 +430,7 @@
                {conbini.searchQuery || "Convenience store near here"}
              </div>
              <div className="bg-slate-100 p-1 rounded-full">
-               <ExternalLink size={12} className="text-slate-400" />
+               <LucideIcon name="external-link" size={12} className="text-slate-400" />
              </div>
           </div>
 
@@ -428,7 +462,7 @@
       return (
         <div className="mb-8 space-y-4 animate-fadeIn">
           <div className="flex items-center gap-2 mb-2">
-            <Star size={16} className="text-[#D32F2F]" />
+            <LucideIcon name="star" size={16} className="text-[#D32F2F]" />
             <h3 className="text-sm font-serif font-bold text-slate-800 tracking-widest">嚴選・推薦</h3>
           </div>
           
@@ -436,11 +470,11 @@
             {/* Eat */}
             <div className="bg-[#FFF5F5] p-4 rounded-xl border border-[#FFEBEE] relative overflow-hidden">
                <div className="absolute right-0 top-0 opacity-10 transform translate-x-2 -translate-y-2">
-                 <Utensils size={60} className="text-[#D32F2F]" />
+                 <LucideIcon name="utensils" size={60} className="text-[#D32F2F]" />
                </div>
                <div className="relative z-10">
                  <h4 className="text-[10px] font-bold text-[#D32F2F] mb-2 tracking-wider flex items-center gap-1">
-                   <Utensils size={12}/> MUST EAT
+                   <LucideIcon name="utensils" size={12}/> MUST EAT
                  </h4>
                  <ul className="space-y-2">
                    {data.eat.map((item, i) => (
@@ -459,11 +493,11 @@
             {/* Buy */}
             <div className="bg-[#F0F9FF] p-4 rounded-xl border border-[#E0F2FE] relative overflow-hidden">
                <div className="absolute right-0 top-0 opacity-10 transform translate-x-2 -translate-y-2">
-                 <ShoppingBag size={60} className="text-[#0284C7]" />
+                 <LucideIcon name="shopping-bag" size={60} className="text-[#0284C7]" />
                </div>
                <div className="relative z-10">
                  <h4 className="text-[10px] font-bold text-[#0284C7] mb-2 tracking-wider flex items-center gap-1">
-                   <ShoppingBag size={12}/> MUST BUY
+                   <LucideIcon name="shopping-bag" size={12}/> MUST BUY
                  </h4>
                  <ul className="space-y-2">
                    {data.buy.map((item, i) => (
@@ -482,6 +516,99 @@
         </div>
       );
     };
+
+    // Boarding Pass Component
+    const BoardingPassCard = ({ flight }) => {
+       if (!flight) return null;
+       return (
+          <div className="mb-8 animate-fadeIn">
+             <div className="flex items-center gap-2 mb-2">
+               <LucideIcon name="ticket" size={16} className="text-[#D32F2F]" />
+               <h3 className="text-sm font-serif font-bold text-slate-800 tracking-widest">航班資訊</h3>
+             </div>
+             
+             <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200 relative">
+               <div className="bg-[#D32F2F] p-6 text-white relative overflow-hidden">
+                 <div className="flex justify-between items-center mb-4 relative z-10">
+                   <div className="flex items-center gap-2">
+                     <LucideIcon name="plane" size={20} className="opacity-80" />
+                     <span className="font-bold tracking-widest">{flight.airline}</span>
+                   </div>
+                   <span className="font-mono font-bold opacity-80">{flight.date}</span>
+                 </div>
+                 
+                 <div className="flex justify-between items-end relative z-10">
+                   <div>
+                     <span className="text-4xl font-bold block">{flight.from}</span>
+                     <span className="text-xs opacity-80 font-medium">{flight.fromCity}</span>
+                   </div>
+                   <div className="flex flex-col items-center pb-2 opacity-80">
+                     <span className="text-xs mb-1">{flight.duration}</span>
+                     <div className="flex items-center gap-1">
+                       <div className="w-2 h-2 rounded-full bg-white/50"></div>
+                       <div className="w-12 h-[1px] bg-white/50"></div>
+                       <LucideIcon name="plane" size={14} className="rotate-90" />
+                       <div className="w-12 h-[1px] bg-white/50"></div>
+                       <div className="w-2 h-2 rounded-full bg-white/50"></div>
+                     </div>
+                   </div>
+                   <div className="text-right">
+                     <span className="text-4xl font-bold block">{flight.to}</span>
+                     <span className="text-xs opacity-80 font-medium">{flight.toCity}</span>
+                   </div>
+                 </div>
+                 <div className="absolute -bottom-6 -left-6 w-16 h-16 bg-white/10 rounded-full"></div>
+                 <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-white/10 rounded-full"></div>
+               </div>
+
+               <div className="relative h-6 bg-white">
+                 <div className="absolute -top-3 left-0 w-6 h-6 bg-[#FFFEFA] rounded-full -ml-3"></div>
+                 <div className="absolute -top-3 right-0 w-6 h-6 bg-[#FFFEFA] rounded-full -mr-3"></div>
+                 <div className="absolute top-2.5 left-4 right-4 border-t-2 border-dashed border-slate-200"></div>
+               </div>
+
+               <div className="p-6 pt-2">
+                 <div className="flex justify-between mb-6">
+                   <div>
+                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Flight</span>
+                     <span className="text-xl font-bold text-slate-800">{flight.code}</span>
+                   </div>
+                   <div>
+                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Class</span>
+                     <span className="text-xl font-bold text-slate-800">{flight.class}</span>
+                   </div>
+                   <div className="text-right">
+                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Seat</span>
+                     <span className="text-xl font-bold text-slate-800">{flight.seat}</span>
+                   </div>
+                 </div>
+
+                 <div className="flex justify-between items-center bg-slate-50 rounded-xl p-4 border border-slate-100">
+                   <div className="text-center flex-1 border-r border-slate-200">
+                     <span className="text-xs text-slate-400 font-bold block mb-1">DEP</span>
+                     <span className="text-2xl font-bold text-slate-800">{flight.depTime}</span>
+                   </div>
+                   <div className="text-center flex-1">
+                     <span className="text-xs text-slate-400 font-bold block mb-1">ARR</span>
+                     <span className="text-2xl font-bold text-slate-800">{flight.arrTime}</span>
+                   </div>
+                 </div>
+                 
+                 <div className="mt-6 flex flex-col items-center justify-center opacity-60">
+                   <div className="h-12 w-full bg-slate-800 relative overflow-hidden rounded-sm">
+                       <div className="absolute inset-0 flex justify-between">
+                            {[...Array(60)].map((_,i) => (
+                                <div key={i} style={{width: Math.random() > 0.5 ? '2px' : '4px', backgroundColor: 'white', height: '100%', marginLeft: Math.random() * 4 + 'px'}}></div>
+                            ))}
+                       </div>
+                   </div>
+                   <span className="text-[10px] font-mono mt-2 tracking-widest text-slate-400">{flight.code} {flight.date.replace('/','')}</span>
+                 </div>
+               </div>
+             </div>
+          </div>
+       )
+    }
 
     // Vertical List Itinerary View
     const ItineraryView = ({ onExpand }) => (
@@ -542,7 +669,7 @@
                 <h2 className="text-3xl font-serif font-bold text-slate-800 mt-2">{day.location}</h2>
               </div>
               <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
-                <ChevronDown size={24} strokeWidth={1.5} />
+                <LucideIcon name="chevron-down" size={24} strokeWidth={1.5} />
               </button>
             </div>
 
@@ -554,6 +681,9 @@
                    {day.intro}
                  </p>
               </div>
+              
+              {/* Flight Card Integration */}
+              {day.flight && <BoardingPassCard flight={day.flight} />}
 
               {/* Recommendations Block */}
               {day.recommends && <Recommendations data={day.recommends} />}
@@ -666,7 +796,7 @@
         <div className="animate-fadeIn px-4">
           <div className="bg-white p-6 rounded-none border border-slate-200 shadow-sm">
             <h3 className="font-serif font-bold text-slate-800 mb-6 flex items-center gap-2 text-lg">
-              <Coins className="text-[#D32F2F]" /> 
+              <LucideIcon name="coins" size={20} className="text-[#D32F2F]" /> 
               即時匯率換算
             </h3>
             
@@ -702,7 +832,7 @@
 
               <div className="flex justify-center -my-3 relative z-10">
                 <div className="bg-white p-2 rounded-full border border-slate-200 shadow-sm text-[#D32F2F]">
-                  <ArrowDownUp size={16} />
+                  <LucideIcon name="arrow-down-up" size={16} />
                 </div>
               </div>
 
@@ -816,7 +946,7 @@
               <form onSubmit={addExpense} className="flex gap-3 mb-6 px-4">
                  <input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Item Name" className="flex-1 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
                  <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="¥" className="w-24 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
-                 <button type="submit" className="text-[#D32F2F] hover:bg-red-50 rounded-full w-10 h-10 flex items-center justify-center transition-colors"><Plus size={24}/></button>
+                 <button type="submit" className="text-[#D32F2F] hover:bg-red-50 rounded-full w-10 h-10 flex items-center justify-center transition-colors"><LucideIcon name="plus" size={24}/></button>
               </form>
 
               <div className="space-y-0 px-4">
@@ -835,7 +965,7 @@
                         onClick={() => removeExpense(i.id)}
                         aria-label="Delete"
                       >
-                        <Trash2 size={20}/>
+                        <LucideIcon name="trash-2" size={20}/>
                       </button>
                     </div>
                   </div>
@@ -858,14 +988,14 @@
                <div className="space-y-3">
                  {gifts.map(g => (
                    <div key={g.id} onClick={() => toggleGift(g.id)} className={`p-5 rounded-lg border cursor-pointer transition-all flex items-center gap-4 ${g.bought ? 'bg-slate-50 border-transparent opacity-60' : 'bg-white border-slate-200 shadow-sm hover:border-[#D32F2F]'}`}>
-                     <div onClick={() => toggleGift(g.id)} className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${g.bought ? 'bg-[#D32F2F] border-[#D32F2F]' : 'border-slate-300'}`}>
-                       {g.bought && <CheckSquare size={14} className="text-white" />}
+                     <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${g.bought ? 'bg-[#D32F2F] border-[#D32F2F]' : 'border-slate-300'}`}>
+                       {g.bought && <LucideIcon name="check-square" size={14} className="text-white" />}
                      </div>
-                     <div className="flex-1" onClick={() => toggleGift(g.id)}>
+                     <div className="flex-1">
                        <div className={`font-serif font-bold text-lg ${g.bought ? 'line-through text-slate-400' : 'text-slate-800'}`}>{g.who}</div>
                        <div className="text-sm text-slate-500 font-serif italic">{g.item}</div>
                      </div>
-                     <button onClick={() => removeGift(g.id)} className="text-slate-300 hover:text-[#D32F2F] p-2"><Trash2 size={18}/></button>
+                     <button onClick={() => removeGift(g.id)} className="text-slate-300 hover:text-[#D32F2F] p-2"><LucideIcon name="trash-2" size={18}/></button>
                    </div>
                  ))}
                  {gifts.length === 0 && <div className="text-center text-slate-300 py-12 text-sm font-serif italic">List is empty.</div>}
@@ -922,10 +1052,10 @@
             {items.map(item => (
               <div key={item.id} className="flex items-center gap-3 group">
                 <div onClick={() => toggle(item.id)} className={`w-5 h-5 border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${item.checked ? (color==='rose'?'bg-[#D32F2F] border-[#D32F2F]':'bg-emerald-700 border-emerald-700') : 'border-slate-300 group-hover:border-slate-400'}`}>
-                  {item.checked && <CheckSquare size={12} className="text-white"/>}
+                  {item.checked && <LucideIcon name="check-square" size={12} className="text-white"/>}
                 </div>
                 <span onClick={() => toggle(item.id)} className={`flex-1 text-sm font-serif cursor-pointer ${item.checked ? 'text-slate-300 line-through decoration-slate-300' : 'text-slate-700'}`}>{item.text}</span>
-                <button onClick={() => removeItem(item.id)} className="text-slate-200 hover:text-red-400 p-1"><X size={14}/></button>
+                <button onClick={() => removeItem(item.id)} className="text-slate-200 hover:text-red-400 p-2"><LucideIcon name="x" size={16} /></button>
               </div>
             ))}
           </div>
@@ -938,7 +1068,7 @@
               placeholder="新增項目..." 
               className="flex-1 bg-slate-50 border border-slate-200 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-slate-400"
             />
-            <button type="submit" className="text-slate-400 hover:text-[#D32F2F]"><Plus size={20}/></button>
+            <button type="submit" className="text-slate-400 hover:text-[#D32F2F]"><LucideIcon name="plus" size={20} /></button>
           </form>
         </div>
       )
@@ -967,10 +1097,10 @@
       return (
         <div className="pb-24">
            <div className="flex justify-center gap-2 mb-8 px-4 overflow-x-auto pb-2 scrollbar-hide">
-             <button onClick={()=>setActiveTool('phrase')} className={`tool-tab ${activeTool==='phrase'?'active':''}`}><MessageCircle size={16}/> 指指通</button>
-             <button onClick={()=>setActiveTool('pack')} className={`tool-tab ${activeTool==='pack'?'active':''}`}><CheckSquare size={16}/> 清單</button>
-             <button onClick={()=>setActiveTool('rate')} className={`tool-tab ${activeTool==='rate'?'active':''}`}><Coins size={16}/> 匯率</button>
-             <button onClick={()=>setActiveTool('info')} className={`tool-tab ${activeTool==='info'?'active':''}`}><Info size={16}/> 資訊</button>
+             <button onClick={()=>setActiveTool('phrase')} className={`tool-tab ${activeTool==='phrase'?'active':''}`}><LucideIcon name="message-circle" size={16}/> 指指通</button>
+             <button onClick={()=>setActiveTool('pack')} className={`tool-tab ${activeTool==='pack'?'active':''}`}><LucideIcon name="check-square" size={16}/> 清單</button>
+             <button onClick={()=>setActiveTool('rate')} className={`tool-tab ${activeTool==='rate'?'active':''}`}><LucideIcon name="coins" size={16}/> 匯率</button>
+             <button onClick={()=>setActiveTool('info')} className={`tool-tab ${activeTool==='info'?'active':''}`}><LucideIcon name="info" size={16}/> 資訊</button>
            </div>
 
            {activeTool === 'phrase' && (
