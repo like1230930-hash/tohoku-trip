@@ -8,8 +8,8 @@
   <meta name="theme-color" content="#FFFEFA">
   
   <!-- PWA Icons -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❄️</text></svg>">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23D32F2F%22/><text x=%2250%22 y=%2255%22 font-size=%2270%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22%23000000%22 font-weight=%22bold%22>冬</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23D32F2F%22/><text x=%2250%22 y=%2255%22 font-size=%2260%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22%23000000%22 font-weight=%22bold%22>冬</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23D32F2F%22/><text x=%2250%22 y=%2255%22 font-size=%2260%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22%23000000%22 font-weight=%22bold%22>冬</text></svg>">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -425,7 +425,7 @@
           </div>
 
           <div className="absolute top-3 left-3 right-3 bg-white/95 backdrop-blur rounded-full px-4 py-2.5 shadow-md border border-slate-100 flex items-center gap-3 z-20">
-             <Search size={16} className="text-slate-400" />
+             <LucideIcon name="search" size={16} className="text-slate-400" />
              <div className="flex-1 truncate text-xs font-bold text-slate-700 font-sans">
                {conbini.searchQuery || "Convenience store near here"}
              </div>
@@ -517,7 +517,7 @@
       );
     };
 
-    // Boarding Pass Component
+    // Boarding Pass Component (Extracted and Defined)
     const BoardingPassCard = ({ flight }) => {
        if (!flight) return null;
        return (
@@ -608,51 +608,9 @@
              </div>
           </div>
        )
-    }
+    };
 
-    // Vertical List Itinerary View
-    const ItineraryView = ({ onExpand }) => (
-      <div className="space-y-6 px-4 pb-28">
-        <div className="flex items-center justify-center gap-3 mb-8 relative">
-          <div className="h-[1px] w-10 bg-slate-300"></div>
-          <h2 className="text-2xl font-serif font-bold text-slate-800 tracking-widest text-center">旅の行程</h2>
-          <div className="h-[1px] w-10 bg-slate-300"></div>
-        </div>
-
-        {itineraryData.map((day) => (
-          <div 
-            key={day.day}
-            onClick={() => onExpand(day)}
-            className="bg-white rounded-xl p-6 border-l-4 border-[#D32F2F] shadow-sm relative overflow-hidden active:bg-slate-50 transition-colors cursor-pointer group hover:shadow-md"
-          >
-            <div className="flex justify-between items-start relative z-10">
-              <div className="flex-1">
-                <div className="flex items-baseline gap-4 mb-2">
-                  <div className="flex flex-col items-center min-w-[3rem]">
-                     <span className="text-3xl font-serif font-bold text-[#D32F2F] leading-none">{day.date.split('/')[1].split(' ')[0]}</span>
-                     <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Dec</span>
-                  </div>
-                  <div className="flex flex-col">
-                     <h3 className="text-xl font-serif font-bold text-slate-800 mb-1">{day.location}</h3>
-                     <p className="text-xs text-slate-500 font-serif tracking-wide line-clamp-1">{day.intro}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-center pl-4 border-l border-slate-100">
-                 <LucideIcon name={day.weather === 'sun' ? 'sun' : day.weather === 'cloudy' ? 'cloud-rain' : 'cloud-snow'} size={20} className="text-slate-400" strokeWidth={1.5} />
-                 <span className="text-xs font-serif mt-1 text-slate-500">{day.temp}</span>
-              </div>
-            </div>
-            <div className="mt-3 flex justify-end">
-               <span className="text-xs text-slate-300 group-hover:text-[#D32F2F] transition-colors flex items-center gap-0.5">
-                  <LucideIcon name="chevron-right" size={14}/>
-               </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-
+    // Detail Modal (Defined BEFORE App)
     const DetailModal = ({ day, onClose }) => {
       if (!day) return null;
       return (
@@ -720,7 +678,7 @@
 
                       {act.important && (
                         <div className="mt-4 text-xs text-[#D32F2F] flex items-start gap-2 leading-relaxed bg-red-50/50 p-3 rounded border border-red-100">
-                          <AlertCircle size={14} className="shrink-0 mt-0.5"/> 
+                          <LucideIcon name="alert-circle" size={14} className="shrink-0 mt-0.5"/> 
                           <span>{act.important}</span>
                         </div>
                       )}
@@ -734,7 +692,7 @@
                   <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                     <div className="flex items-start gap-4">
                       <div className="mt-1">
-                        <BedDouble size={24} strokeWidth={1.5} className="text-[#D32F2F]" />
+                        <LucideIcon name="bed-double" size={24} strokeWidth={1.5} className="text-[#D32F2F]" />
                       </div>
                       <div>
                         <div className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-1">ACCOMMODATION</div>
@@ -752,6 +710,49 @@
         </div>
       );
     };
+
+    // Vertical List Itinerary View
+    const ItineraryView = ({ onExpand }) => (
+      <div className="space-y-6 px-4 pb-28">
+        <div className="flex items-center justify-center gap-3 mb-8 relative">
+          <div className="h-[1px] w-10 bg-slate-300"></div>
+          <h2 className="text-2xl font-serif font-bold text-slate-800 tracking-widest text-center">旅の行程</h2>
+          <div className="h-[1px] w-10 bg-slate-300"></div>
+        </div>
+
+        {itineraryData.map((day) => (
+          <div 
+            key={day.day}
+            onClick={() => onExpand(day)}
+            className="bg-white rounded-xl p-6 border-l-4 border-[#D32F2F] shadow-sm relative overflow-hidden active:bg-slate-50 transition-colors cursor-pointer group hover:shadow-md"
+          >
+            <div className="flex justify-between items-start relative z-10">
+              <div className="flex-1">
+                <div className="flex items-baseline gap-4 mb-2">
+                  <div className="flex flex-col items-center min-w-[3rem]">
+                     <span className="text-3xl font-serif font-bold text-[#D32F2F] leading-none">{day.date.split('/')[1].split(' ')[0]}</span>
+                     <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Dec</span>
+                  </div>
+                  <div className="flex flex-col">
+                     <h3 className="text-xl font-serif font-bold text-slate-800 mb-1">{day.location}</h3>
+                     <p className="text-xs text-slate-500 font-serif tracking-wide line-clamp-1">{day.intro}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col items-center pl-4 border-l border-slate-100">
+                 <LucideIcon name={day.weather === 'sun' ? 'sun' : day.weather === 'cloudy' ? 'cloud-rain' : 'cloud-snow'} size={20} className="text-slate-400" strokeWidth={1.5} />
+                 <span className="text-xs font-serif mt-1 text-slate-500">{day.temp}</span>
+              </div>
+            </div>
+            <div className="mt-3 flex justify-end">
+               <span className="text-xs text-slate-300 group-hover:text-[#D32F2F] transition-colors flex items-center gap-0.5">
+                  詳細 <LucideIcon name="chevron-right" size={14}/>
+               </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
 
     // --- Currency Converter Component ---
     const CurrencyConverter = () => {
@@ -893,6 +894,7 @@
         setDesc(''); setAmount('');
       };
 
+      // Helper to robustly remove item
       const removeExpense = (id) => {
         setItems(prevItems => prevItems.filter(item => item.id !== id));
       };
