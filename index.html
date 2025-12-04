@@ -24,52 +24,34 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- Lucide Icons (Global) -->
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* Custom Styles */
     body { 
       background-color: #FFFEFA; 
       font-family: 'Noto Serif TC', 'Shippori Mincho', serif; 
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-    
     .font-serif { font-family: 'Noto Serif TC', 'Shippori Mincho', serif; }
     .font-sans { font-family: 'Noto Serif TC', sans-serif; } 
-    
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-    
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .animate-slideUp { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    
     @keyframes fall { 0% { transform: translateY(-10vh) translateX(0); } 100% { transform: translateY(100vh) translateX(20px); } }
     .animate-fall { animation-timing-function: linear; animation-iteration-count: infinite; }
     
     .tool-tab { 
-      display:flex; 
-      align-items:center; 
-      gap:6px; 
-      padding:8px 16px; 
-      font-size:12px; 
-      font-weight:bold; 
-      letter-spacing: 0.05em; 
-      white-space:nowrap; 
-      transition:all 0.3s; 
-      background:transparent; 
-      color:#94a3b8; 
-      border-bottom:2px solid transparent; 
-      font-family: 'Noto Serif TC', serif; 
+      display:flex; align-items:center; gap:6px; padding:8px 16px; font-size:12px; font-weight:bold; 
+      letter-spacing: 0.05em; white-space:nowrap; transition:all 0.3s; background:transparent; 
+      color:#94a3b8; border-bottom:2px solid transparent; font-family: 'Noto Serif TC', serif; 
     }
     .tool-tab.active { color:#D32F2F; border-color:#D32F2F; }
     
     .pt-safe-top { padding-top: env(safe-area-inset-top, 20px); }
     .pb-safe-bottom { padding-bottom: env(safe-area-inset-bottom, 20px); }
-    
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body>
@@ -78,7 +60,7 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
     
-    // --- Lucide Icon Wrapper ---
+    // 1. Lucide Icon Wrapper
     const LucideIcon = ({ name, size = 24, className = "", strokeWidth = 2, color, style }) => {
        const ref = useRef(null);
        useEffect(() => {
@@ -90,23 +72,17 @@
             i.style.width = size + 'px';
             i.style.height = size + 'px';
             if (color) i.style.color = color;
-            
             ref.current.appendChild(i);
             window.lucide.createIcons({
               root: ref.current,
-              attrs: {
-                width: size,
-                height: size,
-                'stroke-width': strokeWidth,
-                class: className
-              }
+              attrs: { width: size, height: size, 'stroke-width': strokeWidth, class: className }
             });
          }
        }, [name, size, className, strokeWidth, color]);
        return <span ref={ref} style={{display:'inline-flex', verticalAlign:'middle', ...style}} />;
     };
 
-    // --- Icon Definitions ---
+    // 2. Icon Definitions
     const Plane = (props) => <LucideIcon name="plane" {...props} />;
     const MapPin = (props) => <LucideIcon name="map-pin" {...props} />;
     const Utensils = (props) => <LucideIcon name="utensils" {...props} />;
@@ -121,6 +97,7 @@
     const ChevronDown = (props) => <LucideIcon name="chevron-down" {...props} />;
     const CheckSquare = (props) => <LucideIcon name="check-square" {...props} />;
     const Plus = (props) => <LucideIcon name="plus" {...props} />;
+    const PlusCircle = (props) => <LucideIcon name="plus-circle" {...props} />;
     const Trash2 = (props) => <LucideIcon name="trash-2" {...props} />;
     const Navigation = (props) => <LucideIcon name="navigation" {...props} />;
     const Train = (props) => <LucideIcon name="train" {...props} />;
@@ -142,53 +119,20 @@
     const X = (props) => <LucideIcon name="x" {...props} />;
     const ChevronRight = (props) => <LucideIcon name="chevron-right" {...props} />;
     const Ticket = (props) => <LucideIcon name="ticket" {...props} />;
+    const CheckCircle2 = (props) => <LucideIcon name="check-circle-2" {...props} />;
+    const Circle = (props) => <LucideIcon name="circle" {...props} />;
 
-    // --- Data ---
+    // 3. Data
     const itineraryData = [
       {
-        day: 1,
-        date: "12/6 (六)",
-        location: "仙台",
-        weather: "cloudy", 
-        temp: "2°C",
-        tag: "出發",
-        hotel: "Hotel View Kuroda 天童黑田飯店",
-        hotelTel: "+81-23-654-1515",
-        conbini: {
-          stores: [
-            { name: "Daily Yamazaki", type: "daily", dist: "3 min" },
-            { name: "7-Eleven", type: "711", dist: "5 min" }
-          ],
-          searchQuery: "convenience store near Hotel View Kuroda Tendo",
-          link: "https://www.google.com/maps/search/convenience+store+near+Hotel+View+Kuroda+Tendo"
-        },
-        // Flight Data for Day 1
-        flight: {
-          type: "去程",
-          date: "12/06",
-          airline: "STARLUX",
-          code: "JX862",
-          from: "TPE",
-          fromCity: "台北 (桃園)",
-          to: "SDJ",
-          toCity: "仙台",
-          depTime: "11:50",
-          arrTime: "16:00",
-          duration: "3h 10m",
-          gate: "6",
-          seat: "團體",
-          class: "Economy"
-        },
+        day: 1, date: "12/6 (六)", location: "仙台", weather: "cloudy", temp: "2°C", tag: "出發",
+        hotel: "Hotel View Kuroda 天童黑田飯店", hotelTel: "+81-23-654-1515",
+        conbini: { stores: [{ name: "Daily Yamazaki", type: "daily", dist: "3 min" }, { name: "7-Eleven", type: "711", dist: "5 min" }], searchQuery: "convenience store near Hotel View Kuroda Tendo", link: "https://www.google.com/maps/search/convenience+store+near+Hotel+View+Kuroda+Tendo" },
+        flight: { type: "去程", date: "12/06", airline: "STARLUX", code: "JX862", from: "TPE", fromCity: "台北 (桃園)", to: "SDJ", toCity: "仙台", depTime: "11:50", arrTime: "16:00", duration: "3h 10m", gate: "6", seat: "團體", class: "Economy" },
         intro: "旅程的起點。飛往北國雪境，晚間享用迎賓會席料理。",
         recommends: {
-          eat: [
-            { name: "毛豆奶昔 (Zunda Shake)", desc: "仙台名物，香甜濃郁的毛豆泥風味，機場就喝得到！" },
-            { name: "牛舌便當", desc: "若晚餐沒吃飽，車站買個加熱式牛舌便當當宵夜。" }
-          ],
-          buy: [
-            { name: "萩之月 (Hagi no Tsuki)", desc: "仙台國寶級伴手禮，卡士達醬海綿蛋糕。" },
-            { name: "竹葉魚板 (Sasakamaboko)", desc: "仙台特產，口感Q彈，適合當下酒菜。" }
-          ]
+          eat: [{ name: "毛豆奶昔 (Zunda Shake)", desc: "仙台名物，香甜濃郁的毛豆泥風味。" }, { name: "牛舌便當", desc: "若晚餐沒吃飽，車站買個加熱式牛舌便當當宵夜。" }],
+          buy: [{ name: "萩之月 (Hagi no Tsuki)", desc: "仙台國寶級伴手禮，卡士達醬海綿蛋糕。" }, { name: "竹葉魚板 (Sasakamaboko)", desc: "仙台特產，口感Q彈，適合當下酒菜。" }]
         },
         activities: [
           { time: "09:20", type: "transport", title: "桃園機場集合", desc: "請至第一航廈「星宇航空」6號團體櫃台找導遊周薇小姐報到。", important: "護照帶了嗎？行動電源請放隨身行李喔！", guide: "出發前的小提醒：日本東北室內暖氣很強，建議「洋蔥式穿搭」，裡面不要穿太厚的高領，以免在室內熱到流汗喔。" },
@@ -198,32 +142,13 @@
         ]
       },
       {
-        day: 2,
-        date: "12/7 (日)",
-        location: "山形/福島",
-        weather: "snow",
-        temp: "-2°C",
-        tag: "浪漫",
-        hotel: "Listel Inawashiro Hotel 豬苗代",
-        hotelTel: "+81-24-266-2233",
-        conbini: {
-          stores: [
-            { name: "Hotel Shop", type: "shop", dist: "1F" }
-          ],
-          warning: "最近超商需車程 10 分鐘",
-          searchQuery: "convenience store near Listel Inawashiro Hotel",
-          link: "https://www.google.com/maps/search/convenience+store+near+Listel+Inawashiro+Hotel"
-        }, 
+        day: 2, date: "12/7 (日)", location: "山形/福島", weather: "snow", temp: "-2°C", tag: "浪漫",
+        hotel: "Listel Inawashiro Hotel 豬苗代", hotelTel: "+81-24-266-2233",
+        conbini: { stores: [{ name: "Hotel Shop", type: "shop", dist: "1F" }], warning: "最近超商需車程 10 分鐘", searchQuery: "convenience store near Listel Inawashiro Hotel", link: "https://www.google.com/maps/search/convenience+store+near+Listel+Inawashiro+Hotel" },
         intro: "大正浪漫的銀山溫泉，彷彿穿越時空進入神隱少女的世界。",
         recommends: {
-          eat: [
-            { name: "咖哩麵包 (Haikara-san)", desc: "銀山溫泉必吃！酥脆外皮配上微辣咖哩內餡。" },
-            { name: "手工豆腐 (Nogawa)", desc: "百年老店，在雪中站著吃熱騰騰的湯豆腐最棒。" }
-          ],
-          buy: [
-            { name: "山形櫻桃果凍", desc: "山形縣是櫻桃王國，果凍內有整顆櫻桃。" },
-            { name: "樹冰羅曼史", desc: "藏王樹冰限定餅乾，酥脆好吃。" }
-          ]
+          eat: [{ name: "咖哩麵包 (Haikara-san)", desc: "銀山溫泉必吃！酥脆外皮配上微辣咖哩內餡。" }, { name: "手工豆腐 (Nogawa)", desc: "百年老店，在雪中站著吃熱騰騰的湯豆腐最棒。" }],
+          buy: [{ name: "山形櫻桃果凍", desc: "山形縣是櫻桃王國，果凍內有整顆櫻桃。" }, { name: "樹冰羅曼史", desc: "藏王樹冰限定餅乾，酥脆好吃。" }]
         },
         activities: [
           { time: "上午", type: "sightseeing", title: "銀山溫泉街", desc: "大正浪漫氛圍，木造建築覆蓋著白雪。", highlight: "神隱少女場景", tips: "必吃：入口處的「Haikara-san」咖哩麵包", guide: "這裡以前是銀礦產地，所以叫銀山。兩旁能登屋等旅館的木造建築，保留了大正時代受到西洋影響的風格。紅色的小橋是最佳拍照點，如果運氣好遇到飄雪，真的美到像在做夢！" },
@@ -234,30 +159,13 @@
         ]
       },
       {
-        day: 3,
-        date: "12/8 (一)",
-        location: "會津若松",
-        weather: "snow",
-        temp: "-3°C",
-        tag: "歷史",
-        hotel: "Listel Inawashiro Hotel 豬苗代",
-        hotelTel: "+81-24-266-2233",
-        conbini: {
-          stores: [{ name: "Hotel Shop", type: "shop", dist: "1F" }],
-          warning: "最近超商需車程 10 分鐘",
-          searchQuery: "convenience store near Listel Inawashiro Hotel",
-          link: "https://www.google.com/maps/search/convenience+store+near+Listel+Inawashiro+Hotel"
-        },
+        day: 3, date: "12/8 (一)", location: "會津若松", weather: "snow", temp: "-3°C", tag: "歷史",
+        hotel: "Listel Inawashiro Hotel 豬苗代", hotelTel: "+81-24-266-2233",
+        conbini: { stores: [{ name: "Hotel Shop", type: "shop", dist: "1F" }], warning: "最近超商需車程 10 分鐘", searchQuery: "convenience store near Listel Inawashiro Hotel", link: "https://www.google.com/maps/search/convenience+store+near+Listel+Inawashiro+Hotel" },
         intro: "探訪歷史名城與傳統茅屋聚落，體驗獨特的大蔥蕎麥麵。",
         recommends: {
-          eat: [
-            { name: "大蔥蕎麥麵 (Negi Soba)", desc: "大內宿名物，用蔥當筷子，蔥也能咬著吃！" },
-            { name: "醬汁豬排丼", desc: "會津若松的靈魂美食，鹹甜醬汁超下飯。" }
-          ],
-          buy: [
-            { name: "赤貝古 (Akabeko)", desc: "會津的紅色搖頭牛玩具，象徵除厄開運。" },
-            { name: "會津塗漆器", desc: "傳統工藝品，買雙筷子或湯碗很實用。" }
-          ]
+          eat: [{ name: "大蔥蕎麥麵 (Negi Soba)", desc: "大內宿名物，用蔥當筷子，蔥也能咬著吃！" }, { name: "醬汁豬排丼", desc: "會津若松的靈魂美食，鹹甜醬汁超下飯。" }],
+          buy: [{ name: "赤貝古 (Akabeko)", desc: "會津的紅色搖頭牛玩具，象徵除厄開運。" }, { name: "會津塗漆器", desc: "傳統工藝品，買雙筷子或湯碗很實用。" }]
         },
         activities: [
           { time: "上午", type: "activity", title: "雪中採草莓", desc: "溫室採摘，30分鐘吃到飽。", tag: "當季", guide: "日本草莓不需清洗可以直接吃！東北日夜溫差大，草莓特別甜。記得從蒂頭拔起後，從尾端（尖的那頭）開始吃會感覺比較甜喔！" },
@@ -268,32 +176,13 @@
         ]
       },
       {
-        day: 4,
-        date: "12/9 (二)",
-        location: "仙台",
-        weather: "cloudy", 
-        temp: "1°C",
-        tag: "都會",
-        hotel: "Hotel Keihan Sendai 京阪仙台",
-        hotelTel: "022-263-0321",
-        conbini: {
-          stores: [
-            { name: "FamilyMart", type: "family", dist: "2 min" },
-            { name: "7-Eleven", type: "711", dist: "3 min" }
-          ],
-          searchQuery: "convenience store near Hotel Keihan Sendai",
-          link: "https://www.google.com/maps/search/convenience+store+near+Hotel+Keihan+Sendai"
-        },
+        day: 4, date: "12/9 (二)", location: "仙台", weather: "cloudy", temp: "1°C", tag: "都會",
+        hotel: "Hotel Keihan Sendai 京阪仙台", hotelTel: "022-263-0321",
+        conbini: { stores: [{ name: "FamilyMart", type: "family", dist: "2 min" }, { name: "7-Eleven", type: "711", dist: "3 min" }], searchQuery: "convenience store near Hotel Keihan Sendai", link: "https://www.google.com/maps/search/convenience+store+near+Hotel+Keihan+Sendai" },
         intro: "深入地底探險，回到現代都會。晚上的自由時間是購物重頭戲！",
         recommends: {
-          eat: [
-            { name: "炭烤牛舌 (利久/善治郎)", desc: "仙台必吃！厚切口感脆彈，配麥飯和牛尾湯。" },
-            { name: "鯛魚燒 (阿部蒲鉾店)", desc: "名物「炸葫蘆」(Hyotan Age) 其實是魚漿熱狗！" }
-          ],
-          buy: [
-            { name: "喜久福 (Kikufuku)", desc: "咒術迴戰五條悟推薦！鮮奶油大福。" },
-            { name: "Press Butter Sand", desc: "東北限定口味（如毛豆），送禮超體面。" }
-          ]
+          eat: [{ name: "炭烤牛舌 (利久/善治郎)", desc: "仙台必吃！厚切口感脆彈，配麥飯和牛尾湯。" }, { name: "鯛魚燒 (阿部蒲鉾店)", desc: "名物「炸葫蘆」(Hyotan Age) 其實是魚漿熱狗！" }],
+          buy: [{ name: "喜久福 (Kikufuku)", desc: "咒術迴戰五條悟推薦！鮮奶油大福。" }, { name: "Press Butter Sand", desc: "東北限定口味（如毛豆），送禮超體面。" }]
         },
         activities: [
           { time: "上午", type: "sightseeing", title: "阿武隈洞", desc: "8000萬年形成的鐘乳石洞。", tips: "階梯多，請穿好走的鞋", guide: "洞內像是異世界一樣！最著名的景點是「聖誕樹」和「樹冰」，這是地下水經過數千萬年滴落累積而成的藝術品。洞內恆溫約15度，冬暖夏涼。" },
@@ -302,40 +191,13 @@
         ]
       },
       {
-        day: 5,
-        date: "12/10 (三)",
-        location: "松島",
-        weather: "sun",
-        temp: "3°C",
-        tag: "歸途",
+        day: 5, date: "12/10 (三)", location: "松島", weather: "sun", temp: "3°C", tag: "歸途",
         hotel: "溫暖的家",
-        // Flight Data for Day 5
-        flight: {
-          type: "回程",
-          date: "12/10",
-          airline: "STARLUX",
-          code: "JX863",
-          from: "SDJ",
-          fromCity: "仙台",
-          to: "TPE",
-          toCity: "台北 (桃園)",
-          depTime: "17:15",
-          arrTime: "20:35",
-          duration: "4h 20m",
-          gate: "--",
-          seat: "團體",
-          class: "Economy"
-        },
+        flight: { type: "回程", date: "12/10", airline: "STARLUX", code: "JX863", from: "SDJ", fromCity: "仙台", to: "TPE", toCity: "台北 (桃園)", depTime: "17:15", arrTime: "20:35", duration: "4h 20m", gate: "--", seat: "團體", class: "Economy" },
         intro: "旅程最終章，在松島留下美好回憶，帶著滿滿戰利品回家。",
         recommends: {
-          eat: [
-            { name: "現烤牡蠣", desc: "松島牡蠣肥美多汁，路邊就有得買！" },
-            { name: "手烤魚板體驗", desc: "自己烤的魚板特別香，現烤現吃。" }
-          ],
-          buy: [
-            { name: "AEON 超市零食", desc: "最後機會！把日幣零錢全部換成餅乾糖果。" },
-            { name: "仙台味噌", desc: "風味濃郁，回家煮湯就能重溫日本味。" }
-          ]
+          eat: [{ name: "現烤牡蠣", desc: "松島牡蠣肥美多汁，路邊就有得買！" }, { name: "手烤魚板體驗", desc: "自己烤的魚板特別香，現烤現吃。" }],
+          buy: [{ name: "AEON 超市零食", desc: "最後機會！把日幣零錢全部換成餅乾糖果。" }, { name: "仙台味噌", desc: "風味濃郁，回家煮湯就能重溫日本味。" }]
         },
         activities: [
           { time: "上午", type: "sightseeing", title: "松島遊船", desc: "搭船巡遊松島灣。", tag: "日本三景", guide: "俳句詩人松尾芭蕉曾讚嘆松島之美。松島灣內有260多個島嶼，可以試著找找看最像「仁王像」的仁王島。記得，船上禁止餵食海鷗喔！" },
@@ -346,8 +208,7 @@
       }
     ];
 
-    // --- Components ---
-
+    // --- 4. Helper Components ---
     const Snowfall = () => {
       const flakes = [...Array(30)].map((_, i) => {
         const left = Math.random() * 100 + '%';
@@ -367,7 +228,6 @@
       let iconName = "cloud-snow";
       if (type === 'sun') iconName = "sun";
       if (type === 'cloudy') iconName = "cloud-rain";
-      
       return (
         <div className="flex flex-col items-center justify-center p-3 bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-[#F0E0E0] min-w-[70px] animate-fadeIn">
           <span className="text-[10px] font-serif font-bold text-slate-400 mb-1 tracking-widest uppercase">{location}</span>
@@ -396,50 +256,44 @@
         if (type === 'daily') return "text-[#D9232A]"; 
         return "text-slate-500"; 
       };
-
       return (
         <a href={conbini.link} target="_blank" rel="noopener noreferrer" className="block group relative w-full h-48 rounded-xl overflow-hidden border border-slate-200 shadow-sm transition-shadow hover:shadow-md mt-4">
           <div className="absolute inset-0 bg-[#F2F4F6]">
             <div className="absolute top-0 left-1/3 w-4 h-full bg-white/80 border-x border-slate-200/50 transform -skew-x-12"></div>
             <div className="absolute top-1/3 left-0 w-full h-4 bg-white/80 border-y border-slate-200/50 transform skew-y-6"></div>
             <div className="absolute bottom-10 right-0 w-2/3 h-3 bg-white/80 border-y border-slate-200/50"></div>
-            
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
                <div className="relative">
                  <div className="w-4 h-4 bg-blue-500/20 rounded-full animate-ping absolute"></div>
-                 <LucideIcon name="map-pin" size={32} className="text-blue-600 fill-white drop-shadow-md" />
+                 <MapPin size={32} className="text-blue-600 fill-white drop-shadow-md" />
                </div>
             </div>
-
             {conbini.stores.map((store, idx) => {
                const positions = [{ top: '20%', left: '20%' }, { top: '30%', left: '80%' }, { top: '70%', left: '30%' }, { top: '60%', left: '70%' }];
                const pos = positions[idx % positions.length];
                return (
                  <div key={idx} className="absolute z-0 transform hover:scale-110 transition-transform" style={pos}>
                     <div className="flex flex-col items-center">
-                       <LucideIcon name="store" size={24} className={`${getPinColor(store.type)} fill-white drop-shadow-sm`} />
+                       <Store size={24} className={`${getPinColor(store.type)} fill-white drop-shadow-sm`} />
                     </div>
                  </div>
                )
             })}
           </div>
-
           <div className="absolute top-3 left-3 right-3 bg-white/95 backdrop-blur rounded-full px-4 py-2.5 shadow-md border border-slate-100 flex items-center gap-3 z-20">
-             <LucideIcon name="search" size={16} className="text-slate-400" />
+             <Search size={16} className="text-slate-400" />
              <div className="flex-1 truncate text-xs font-bold text-slate-700 font-sans">
                {conbini.searchQuery || "Convenience store near here"}
              </div>
              <div className="bg-slate-100 p-1 rounded-full">
-               <LucideIcon name="external-link" size={12} className="text-slate-400" />
+               <ExternalLink size={12} className="text-slate-400" />
              </div>
           </div>
-
           {conbini.warning && (
             <div className="absolute bottom-0 left-0 right-0 bg-red-500/90 text-white text-[10px] font-bold py-1.5 text-center backdrop-blur-sm z-20">
               <span className="inline-flex items-center gap-1"><AlertCircle size={10}/> {conbini.warning}</span>
             </div>
           )}
-
           {!conbini.warning && (
             <div className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto no-scrollbar z-20">
               {conbini.stores.map((store, idx) => (
@@ -462,81 +316,55 @@
       return (
         <div className="mb-8 space-y-4 animate-fadeIn">
           <div className="flex items-center gap-2 mb-2">
-            <LucideIcon name="star" size={16} className="text-[#D32F2F]" />
+            <Star size={16} className="text-[#D32F2F]" />
             <h3 className="text-sm font-serif font-bold text-slate-800 tracking-widest">嚴選・推薦</h3>
           </div>
-          
           <div className="grid grid-cols-1 gap-3">
-            {/* Eat */}
-            <div className="bg-[#FFF5F5] p-4 rounded-xl border border-[#FFEBEE] relative overflow-hidden">
-               <div className="absolute right-0 top-0 opacity-10 transform translate-x-2 -translate-y-2">
-                 <LucideIcon name="utensils" size={60} className="text-[#D32F2F]" />
-               </div>
-               <div className="relative z-10">
-                 <h4 className="text-[10px] font-bold text-[#D32F2F] mb-2 tracking-wider flex items-center gap-1">
-                   <LucideIcon name="utensils" size={12}/> MUST EAT
-                 </h4>
-                 <ul className="space-y-2">
-                   {data.eat.map((item, i) => (
-                     <li key={i} className="flex items-start gap-2">
-                       <div className="w-1 h-1 bg-[#D32F2F] rounded-full mt-1.5 shrink-0"></div>
-                       <div>
-                         <span className="text-sm font-bold text-slate-800 block">{item.name}</span>
-                         <span className="text-xs text-slate-500 font-serif">{item.desc}</span>
-                       </div>
-                     </li>
-                   ))}
-                 </ul>
-               </div>
-            </div>
-
-            {/* Buy */}
-            <div className="bg-[#F0F9FF] p-4 rounded-xl border border-[#E0F2FE] relative overflow-hidden">
-               <div className="absolute right-0 top-0 opacity-10 transform translate-x-2 -translate-y-2">
-                 <LucideIcon name="shopping-bag" size={60} className="text-[#0284C7]" />
-               </div>
-               <div className="relative z-10">
-                 <h4 className="text-[10px] font-bold text-[#0284C7] mb-2 tracking-wider flex items-center gap-1">
-                   <LucideIcon name="shopping-bag" size={12}/> MUST BUY
-                 </h4>
-                 <ul className="space-y-2">
-                   {data.buy.map((item, i) => (
-                     <li key={i} className="flex items-start gap-2">
-                       <div className="w-1 h-1 bg-[#0284C7] rounded-full mt-1.5 shrink-0"></div>
-                       <div>
-                         <span className="text-sm font-bold text-slate-800 block">{item.name}</span>
-                         <span className="text-xs text-slate-500 font-serif">{item.desc}</span>
-                       </div>
-                     </li>
-                   ))}
-                 </ul>
-               </div>
-            </div>
+            {data.eat && data.eat.length > 0 && (
+              <div className="bg-[#FFF5F5] p-4 rounded-xl border border-[#FFEBEE] relative overflow-hidden">
+                 <div className="absolute right-0 top-0 opacity-10 transform translate-x-2 -translate-y-2">
+                   <Utensils size={60} className="text-[#D32F2F]" />
+                 </div>
+                 <div className="relative z-10">
+                   <h4 className="text-[10px] font-bold text-[#D32F2F] mb-2 tracking-wider flex items-center gap-1">
+                     <Utensils size={12}/> MUST EAT
+                   </h4>
+                   <ul className="space-y-2">
+                     {data.eat.map((item, i) => (
+                       <li key={i} className="flex items-start gap-2">
+                         <div className="w-1 h-1 bg-[#D32F2F] rounded-full mt-1.5 shrink-0"></div>
+                         <div>
+                           <span className="text-sm font-bold text-slate-800 block">{item.name}</span>
+                           <span className="text-xs text-slate-500 font-serif">{item.desc}</span>
+                         </div>
+                       </li>
+                     ))}
+                   </ul>
+                 </div>
+              </div>
+            )}
           </div>
         </div>
       );
     };
 
-    // Boarding Pass Component (Extracted and Defined)
     const BoardingPassCard = ({ flight }) => {
        if (!flight) return null;
        return (
           <div className="mb-8 animate-fadeIn">
              <div className="flex items-center gap-2 mb-2">
-               <LucideIcon name="ticket" size={16} className="text-[#D32F2F]" />
+               <Ticket size={16} className="text-[#D32F2F]" />
                <h3 className="text-sm font-serif font-bold text-slate-800 tracking-widest">航班資訊</h3>
              </div>
-             
              <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200 relative">
                <div className="bg-[#D32F2F] p-6 text-white relative overflow-hidden">
                  <div className="flex justify-between items-center mb-4 relative z-10">
                    <div className="flex items-center gap-2">
-                     <LucideIcon name="plane" size={20} className="opacity-80" />
+                     <Plane size={20} className="opacity-80" />
                      <span className="font-bold tracking-widest">{flight.airline}</span>
                    </div>
                    <span className="font-mono font-bold opacity-80">{flight.date}</span>
                  </div>
-                 
                  <div className="flex justify-between items-end relative z-10">
                    <div>
                      <span className="text-4xl font-bold block">{flight.from}</span>
@@ -547,7 +375,7 @@
                      <div className="flex items-center gap-1">
                        <div className="w-2 h-2 rounded-full bg-white/50"></div>
                        <div className="w-12 h-[1px] bg-white/50"></div>
-                       <LucideIcon name="plane" size={14} className="rotate-90" />
+                       <Plane size={14} className="rotate-90" />
                        <div className="w-12 h-[1px] bg-white/50"></div>
                        <div className="w-2 h-2 rounded-full bg-white/50"></div>
                      </div>
@@ -560,13 +388,11 @@
                  <div className="absolute -bottom-6 -left-6 w-16 h-16 bg-white/10 rounded-full"></div>
                  <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-white/10 rounded-full"></div>
                </div>
-
                <div className="relative h-6 bg-white">
                  <div className="absolute -top-3 left-0 w-6 h-6 bg-[#FFFEFA] rounded-full -ml-3"></div>
                  <div className="absolute -top-3 right-0 w-6 h-6 bg-[#FFFEFA] rounded-full -mr-3"></div>
                  <div className="absolute top-2.5 left-4 right-4 border-t-2 border-dashed border-slate-200"></div>
                </div>
-
                <div className="p-6 pt-2">
                  <div className="flex justify-between mb-6">
                    <div>
@@ -582,7 +408,6 @@
                      <span className="text-xl font-bold text-slate-800">{flight.seat}</span>
                    </div>
                  </div>
-
                  <div className="flex justify-between items-center bg-slate-50 rounded-xl p-4 border border-slate-100">
                    <div className="text-center flex-1 border-r border-slate-200">
                      <span className="text-xs text-slate-400 font-bold block mb-1">DEP</span>
@@ -593,7 +418,6 @@
                      <span className="text-2xl font-bold text-slate-800">{flight.arrTime}</span>
                    </div>
                  </div>
-                 
                  <div className="mt-6 flex flex-col items-center justify-center opacity-60">
                    <div className="h-12 w-full bg-slate-800 relative overflow-hidden rounded-sm">
                        <div className="absolute inset-0 flex justify-between">
@@ -610,108 +434,105 @@
        )
     };
 
-    // Detail Modal (Defined BEFORE App)
-    const DetailModal = ({ day, onClose }) => {
-      if (!day) return null;
+    const SouvenirTracker = ({ dayId, suggestions }) => {
+      const [myList, setMyList] = useState([]);
+      const [newItem, setNewItem] = useState("");
+      const storageKey = `tohoku_souvenir_${dayId}`;
+
+      useEffect(() => {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) setMyList(JSON.parse(saved));
+      }, [dayId]);
+
+      const saveList = (list) => {
+        setMyList(list);
+        localStorage.setItem(storageKey, JSON.stringify(list));
+      };
+
+      const addItem = (text) => {
+        if (!text.trim()) return;
+        const item = { id: Date.now(), text, checked: false };
+        saveList([...myList, item]);
+        setNewItem("");
+      };
+
+      const addSuggestion = (sugg) => {
+        const item = { id: Date.now(), text: sugg.name, checked: false };
+        saveList([...myList, item]);
+      };
+
+      const toggleItem = (id) => {
+        saveList(myList.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
+      };
+
+      const deleteItem = (id) => {
+        saveList(myList.filter(item => item.id !== id));
+      };
+
       return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose}></div>
-          <div className="bg-[#FFFEFA] w-full h-[92vh] sm:w-[450px] sm:h-[85vh] sm:rounded-t-3xl rounded-t-3xl shadow-2xl relative flex flex-col animate-slideUp font-serif">
-            
-            <div className="bg-white/90 backdrop-blur-md p-6 rounded-t-3xl border-b border-[#F0E0E0] shrink-0 flex justify-between items-start sticky top-0 z-20">
-              <div>
-                <div className="flex items-center gap-3 mb-1">
-                  <span className="bg-[#D32F2F] text-white px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase">{day.tag}</span>
-                  <span className="text-slate-400 text-xs font-bold tracking-wider">{day.date}</span>
-                </div>
-                <h2 className="text-3xl font-serif font-bold text-slate-800 mt-2">{day.location}</h2>
-              </div>
-              <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
-                <LucideIcon name="chevron-down" size={24} strokeWidth={1.5} />
-              </button>
+        <div className="mb-8 space-y-4 animate-fadeIn">
+           <div className="flex items-center gap-2 mb-2">
+            <ShoppingBag size={16} className="text-[#0284C7]" />
+            <h3 className="text-sm font-serif font-bold text-slate-800 tracking-widest">要買的東東</h3>
+          </div>
+          {suggestions && suggestions.length > 0 && (
+            <div className="bg-[#F0F9FF] p-4 rounded-xl border border-[#E0F2FE]">
+               <h4 className="text-[10px] font-bold text-[#0284C7] mb-3 tracking-wider opacity-70">
+                 推薦購買 (點擊加入清單)
+               </h4>
+               <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+                 {suggestions.map((item, i) => (
+                   <button 
+                    key={i} 
+                    onClick={() => addSuggestion(item)}
+                    className="flex items-center gap-2 bg-white border border-blue-100 rounded-lg p-2 pr-3 shadow-sm shrink-0 active:scale-95 transition-transform text-left"
+                   >
+                     <div>
+                       <span className="text-xs font-bold text-slate-700 block">{item.name}</span>
+                       <span className="text-[9px] text-slate-400 block">{item.desc}</span>
+                     </div>
+                     <PlusCircle size={14} className="text-[#0284C7] ml-1" />
+                   </button>
+                 ))}
+               </div>
             </div>
-
-            <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-20">
-              {/* Intro */}
-              <div className="relative pl-4">
-                 <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#D32F2F]"></div>
-                 <p className="text-sm text-slate-600 leading-loose font-serif italic">
-                   {day.intro}
-                 </p>
-              </div>
-              
-              {/* Flight Card Integration */}
-              {day.flight && <BoardingPassCard flight={day.flight} />}
-
-              {/* Recommendations Block */}
-              {day.recommends && <Recommendations data={day.recommends} />}
-
-              {/* Timeline */}
-              <div className="space-y-0 relative pl-2">
-                <div className="absolute left-[19px] top-4 bottom-4 w-[1px] bg-slate-200"></div>
-
-                {day.activities.map((act, i) => (
-                  <div key={i} className="flex gap-6 relative mb-10 last:mb-0 group">
-                    <div className={`w-10 h-10 rounded-full shrink-0 border-[1px] border-slate-200 bg-white z-10 flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.05)] group-hover:border-[#D32F2F] transition-colors`}>
-                       <LucideIcon 
-                         name={act.type === 'flight' ? 'plane' : act.type === 'arrival' ? 'map-pin' : act.type === 'food' ? 'utensils' : act.type === 'sightseeing' ? 'camera' : act.type === 'shopping' ? 'shopping-bag' : 'gift'} 
-                         size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-[#D32F2F]" 
-                       />
-                    </div>
-                    
-                    <div className="flex-1 pt-1">
-                      <div className="flex flex-col mb-2">
-                        <span className="text-xs font-bold text-slate-400 font-sans tracking-wider mb-1">{act.time}</span>
-                        <span className="text-xl font-serif font-bold text-slate-800">{act.title}</span>
-                      </div>
-                      
-                      <p className="text-sm text-slate-600 leading-relaxed mb-3 font-serif">{act.desc}</p>
-                      
-                      {(act.highlight || act.tag) && (
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {act.tag && <span className="text-[10px] border border-[#D32F2F] text-[#D32F2F] px-2 py-0.5 tracking-wider">{act.tag}</span>}
-                          {act.highlight && <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 tracking-wider">★ {act.highlight}</span>}
-                        </div>
-                      )}
-
-                      {act.guide && <GuideCard text={act.guide} />}
-
-                      {act.important && (
-                        <div className="mt-4 text-xs text-[#D32F2F] flex items-start gap-2 leading-relaxed bg-red-50/50 p-3 rounded border border-red-100">
-                          <LucideIcon name="alert-circle" size={14} className="shrink-0 mt-0.5"/> 
-                          <span>{act.important}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {day.hotel && (
-                <div className="mt-12 pt-8 border-t border-slate-100">
-                  <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <div className="flex items-start gap-4">
-                      <div className="mt-1">
-                        <LucideIcon name="bed-double" size={24} strokeWidth={1.5} className="text-[#D32F2F]" />
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-1">ACCOMMODATION</div>
-                        <div className="text-lg font-serif font-bold text-slate-800">{day.hotel}</div>
-                        {day.hotelTel && <div className="text-xs text-slate-500 mt-1 font-sans tracking-wider">{day.hotelTel}</div>}
-                      </div>
-                    </div>
-
-                    {day.conbini && <ConbiniMapCard conbini={day.conbini} />}
-                  </div>
-                </div>
-              )}
-            </div>
+          )}
+          <div className="bg-white border border-slate-200 rounded-xl p-4">
+             <div className="space-y-2">
+               {myList.length === 0 && <div className="text-center text-xs text-slate-300 py-4">清單是空的，加點東西吧！</div>}
+               {myList.map(item => (
+                 <div key={item.id} className="flex items-center gap-3 group">
+                    <button onClick={() => toggleItem(item.id)} className={`shrink-0 transition-colors ${item.checked ? 'text-[#0284C7]' : 'text-slate-300'}`}>
+                      <CheckSquare size={18} className={item.checked ? "text-[#0284C7]" : "text-slate-300"} />
+                    </button>
+                    <span className={`flex-1 text-sm font-serif ${item.checked ? 'text-slate-400 line-through decoration-slate-300' : 'text-slate-700'}`}>
+                      {item.text}
+                    </span>
+                    <button onClick={() => deleteItem(item.id)} className="text-slate-200 hover:text-red-400 p-1">
+                      <X size={14} />
+                    </button>
+                 </div>
+               ))}
+             </div>
+             <form onSubmit={(e) => { e.preventDefault(); addItem(newItem); }} className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
+               <input 
+                 type="text" 
+                 value={newItem}
+                 onChange={(e) => setNewItem(e.target.value)}
+                 placeholder="輸入想買的東西..."
+                 className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#0284C7]"
+               />
+               <button type="submit" className="bg-[#0284C7] text-white rounded-lg w-8 h-8 flex items-center justify-center">
+                 <Plus size={16} />
+               </button>
+             </form>
           </div>
         </div>
       );
     };
 
-    // Vertical List Itinerary View
+    // --- 5. Main Views ---
+
     const ItineraryView = ({ onExpand }) => (
       <div className="space-y-6 px-4 pb-28">
         <div className="flex items-center justify-center gap-3 mb-8 relative">
@@ -719,7 +540,6 @@
           <h2 className="text-2xl font-serif font-bold text-slate-800 tracking-widest text-center">旅の行程</h2>
           <div className="h-[1px] w-10 bg-slate-300"></div>
         </div>
-
         {itineraryData.map((day) => (
           <div 
             key={day.day}
@@ -746,7 +566,7 @@
             </div>
             <div className="mt-3 flex justify-end">
                <span className="text-xs text-slate-300 group-hover:text-[#D32F2F] transition-colors flex items-center gap-0.5">
-                  詳細 <LucideIcon name="chevron-right" size={14}/>
+                  <ChevronRight size={14}/>
                </span>
             </div>
           </div>
@@ -754,9 +574,234 @@
       </div>
     );
 
-    // --- Currency Converter Component ---
+    const DetailModal = ({ day, onClose }) => {
+      if (!day) return null;
+      return (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose}></div>
+          <div className="bg-[#FFFEFA] w-full h-[92vh] sm:w-[450px] sm:h-[85vh] sm:rounded-t-3xl rounded-t-3xl shadow-2xl relative flex flex-col animate-slideUp font-serif">
+            <div className="bg-white/90 backdrop-blur-md p-6 rounded-t-3xl border-b border-[#F0E0E0] shrink-0 flex justify-between items-start sticky top-0 z-20">
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="bg-[#D32F2F] text-white px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase">{day.tag}</span>
+                  <span className="text-slate-400 text-xs font-bold tracking-wider">{day.date}</span>
+                </div>
+                <h2 className="text-3xl font-serif font-bold text-slate-800 mt-2">{day.location}</h2>
+              </div>
+              <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
+                <ChevronDown size={24} strokeWidth={1.5} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-20">
+              <div className="relative pl-4">
+                 <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#D32F2F]"></div>
+                 <p className="text-sm text-slate-600 leading-loose font-serif italic">
+                   {day.intro}
+                 </p>
+              </div>
+              {day.flight && <BoardingPassCard flight={day.flight} />}
+              <SouvenirTracker dayId={day.day} suggestions={day.recommends?.buy} />
+              {day.recommends && <Recommendations data={day.recommends} />}
+              <div className="space-y-0 relative pl-2">
+                <div className="absolute left-[19px] top-4 bottom-4 w-[1px] bg-slate-200"></div>
+                {day.activities.map((act, i) => (
+                  <div key={i} className="flex gap-6 relative mb-10 last:mb-0 group">
+                    <div className={`w-10 h-10 rounded-full shrink-0 border-[1px] border-slate-200 bg-white z-10 flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.05)] group-hover:border-[#D32F2F] transition-colors`}>
+                       <LucideIcon 
+                         name={act.type === 'flight' ? 'plane' : act.type === 'arrival' ? 'map-pin' : act.type === 'food' ? 'utensils' : act.type === 'sightseeing' ? 'camera' : act.type === 'shopping' ? 'shopping-bag' : 'gift'} 
+                         size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-[#D32F2F]" 
+                       />
+                    </div>
+                    <div className="flex-1 pt-1">
+                      <div className="flex flex-col mb-2">
+                        <span className="text-xs font-bold text-slate-400 font-sans tracking-wider mb-1">{act.time}</span>
+                        <span className="text-xl font-serif font-bold text-slate-800">{act.title}</span>
+                      </div>
+                      <p className="text-sm text-slate-600 leading-relaxed mb-3 font-serif">{act.desc}</p>
+                      {act.guide && <GuideCard text={act.guide} />}
+                      {act.important && (
+                        <div className="mt-4 text-xs text-[#D32F2F] flex items-start gap-2 leading-relaxed bg-red-50/50 p-3 rounded border border-red-100">
+                          <AlertCircle size={14} className="shrink-0 mt-0.5"/> 
+                          <span>{act.important}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {day.hotel && (
+                <div className="mt-12 pt-8 border-t border-slate-100">
+                  <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="mt-1">
+                        <BedDouble size={24} strokeWidth={1.5} className="text-[#D32F2F]" />
+                      </div>
+                      <div>
+                        <div className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-1">ACCOMMODATION</div>
+                        <div className="text-lg font-serif font-bold text-slate-800">{day.hotel}</div>
+                        {day.hotelTel && <div className="text-xs text-slate-500 mt-1 font-sans tracking-wider">{day.hotelTel}</div>}
+                      </div>
+                    </div>
+                    {day.conbini && <ConbiniMapCard conbini={day.conbini} />}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // Shopping View
+    const ShoppingView = () => {
+      const [items, setItems] = useState([]);
+      const [desc, setDesc] = useState('');
+      const [amount, setAmount] = useState('');
+      const [rate, setRate] = useState(0.22);
+
+      useEffect(() => {
+        const savedExp = localStorage.getItem('tohoku_v5_expenses');
+        const savedRate = localStorage.getItem('tohoku_rate');
+        if (savedExp) setItems(JSON.parse(savedExp));
+        if (savedRate) setRate(parseFloat(savedRate));
+      }, []);
+
+      useEffect(() => {
+        localStorage.setItem('tohoku_v5_expenses', JSON.stringify(items));
+      }, [items]);
+
+      const addExpense = (e) => {
+        e.preventDefault();
+        if (!desc || !amount) return;
+        setItems(prev => [{ id: Date.now(), desc, amount: parseFloat(amount) }, ...prev]);
+        setDesc(''); setAmount('');
+      };
+
+      const removeExpense = (id) => {
+        setItems(prevItems => prevItems.filter(item => item.id !== id));
+      };
+
+      const total = items.reduce((acc, cur) => acc + cur.amount, 0);
+
+      return (
+        <div className="space-y-8 pb-24">
+          <div className="animate-fadeIn">
+            <div className="bg-white p-8 rounded-none border-y border-slate-200 mb-8 text-center relative">
+               <p className="text-[10px] text-slate-400 mb-2 font-bold tracking-[0.2em] uppercase">Total Expenses</p>
+               <div className="text-5xl font-serif font-bold text-slate-800 tracking-tighter">
+                 <span className="text-2xl mr-2 font-light text-slate-400">¥</span>{total.toLocaleString()}
+               </div>
+               <div className="text-sm text-slate-400 mt-1 font-sans">
+                 ≈ NT$ {Math.round(total * rate).toLocaleString()}
+               </div>
+            </div>
+            
+            <form onSubmit={addExpense} className="flex gap-3 mb-6 px-4">
+               <input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Item Name" className="flex-1 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
+               <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="¥" className="w-24 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
+               <button type="submit" className="text-[#D32F2F] hover:bg-red-50 rounded-full w-10 h-10 flex items-center justify-center transition-colors"><Plus size={24}/></button>
+            </form>
+
+            <div className="space-y-0 px-4">
+              {items.map(i => (
+                <div key={i.id} className="bg-white py-4 border-b border-slate-100 flex justify-between items-center">
+                  <span className="text-slate-700 font-serif font-medium text-lg">{i.desc}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-end mr-2">
+                      <span className="font-serif font-bold text-slate-800 text-lg">¥ {i.amount.toLocaleString()}</span>
+                      <span className="text-[10px] text-slate-400 font-sans">≈ NT$ {Math.round(i.amount * rate).toLocaleString()}</span>
+                    </div>
+                    <button 
+                      type="button" 
+                      className="text-slate-300 hover:text-[#D32F2F] transition-colors p-2 -mr-2" 
+                      onClick={() => removeExpense(i.id)}
+                      aria-label="Delete"
+                    >
+                      <Trash2 size={20}/>
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {items.length === 0 && <div className="text-center text-slate-300 py-12 text-sm font-serif italic">No expenses recorded yet.</div>}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // CheckList
+    const CheckListSection = ({ title, color, listKey }) => {
+      const [items, setItems] = useState([]);
+      const [newItem, setNewItem] = useState(''); 
+      const defaultItems = listKey === 'carryon' 
+        ? ["發熱衣", "防風外套", "圍巾/手套", "毛帽", "防滑靴", "護唇膏", "行動電源"]
+        : ["常備藥", "乳液", "牙刷牙膏", "轉接頭", "充電器", "壓縮袋", "大購物袋"];
+
+      useEffect(() => {
+        const saved = localStorage.getItem(`tohoku_v6_${listKey}`);
+        if (saved) setItems(JSON.parse(saved));
+        else setItems(defaultItems.map((txt, i) => ({ id: i, text: txt, checked: false })));
+      }, []);
+
+      const updateStorage = (newItems) => {
+        setItems(newItems);
+        localStorage.setItem(`tohoku_v6_${listKey}`, JSON.stringify(newItems));
+      };
+
+      const toggle = (id) => {
+        const newItems = items.map(i => i.id === id ? { ...i, checked: !i.checked } : i);
+        updateStorage(newItems);
+      };
+
+      const addItem = (e) => {
+        e.preventDefault();
+        if (!newItem.trim()) return;
+        const newEntry = { id: Date.now(), text: newItem, checked: false };
+        updateStorage([...items, newEntry]);
+        setNewItem('');
+      };
+
+      const removeItem = (id) => {
+        updateStorage(items.filter(i => i.id !== id));
+      };
+
+      return (
+        <div className="bg-white p-6 rounded-none border border-slate-200">
+          <h3 className={`font-serif font-bold mb-4 tracking-wider flex items-center gap-2 ${color === 'rose' ? 'text-[#D32F2F]' : 'text-emerald-700'}`}>
+            <div className={`w-2 h-2 rounded-full ${color === 'rose' ? 'bg-[#D32F2F]' : 'bg-emerald-700'}`}></div>
+            {title}
+          </h3>
+          
+          <div className="space-y-3 mb-4">
+            {items.map(item => (
+              <div key={item.id} className="flex items-center gap-3 group">
+                <div onClick={() => toggle(item.id)} className={`w-5 h-5 border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${item.checked ? (color==='rose'?'bg-[#D32F2F] border-[#D32F2F]':'bg-emerald-700 border-emerald-700') : 'border-slate-300 group-hover:border-slate-400'}`}>
+                  {item.checked && <CheckSquare size={12} className="text-white"/>}
+                </div>
+                <span onClick={() => toggle(item.id)} className={`flex-1 text-sm font-serif cursor-pointer ${item.checked ? 'text-slate-300 line-through decoration-slate-300' : 'text-slate-700'}`}>{item.text}</span>
+                <button onClick={() => removeItem(item.id)} className="text-slate-200 hover:text-red-400 p-2"><X size={16}/></button>
+              </div>
+            ))}
+          </div>
+
+          <form onSubmit={addItem} className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
+            <input 
+              type="text" 
+              value={newItem} 
+              onChange={(e) => setNewItem(e.target.value)} 
+              placeholder="新增項目..." 
+              className="flex-1 bg-slate-50 border border-slate-200 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-slate-400"
+            />
+            <button type="submit" className="text-slate-400 hover:text-[#D32F2F]"><Plus size={20}/></button>
+          </form>
+        </div>
+      )
+    }
+
+    // Currency Converter
     const CurrencyConverter = () => {
-      const [rate, setRate] = useState(0.22); // Default rough rate
+      const [rate, setRate] = useState(0.22);
       const [jpy, setJpy] = useState('');
       const [twd, setTwd] = useState('');
 
@@ -797,11 +842,10 @@
         <div className="animate-fadeIn px-4">
           <div className="bg-white p-6 rounded-none border border-slate-200 shadow-sm">
             <h3 className="font-serif font-bold text-slate-800 mb-6 flex items-center gap-2 text-lg">
-              <LucideIcon name="coins" size={20} className="text-[#D32F2F]" /> 
+              <Coins size={20} className="text-[#D32F2F]" /> 
               即時匯率換算
             </h3>
             
-            {/* Rate Input */}
             <div className="mb-6 flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200">
                <span className="text-xs font-bold text-slate-500">目前匯率 (JPY → TWD)</span>
                <div className="flex items-center gap-2">
@@ -815,7 +859,6 @@
                </div>
             </div>
 
-            {/* Converter Inputs */}
             <div className="space-y-4">
               <div className="relative">
                 <label className="absolute -top-2.5 left-3 bg-white px-1 text-[10px] font-bold text-slate-400">JPY (日幣)</label>
@@ -833,7 +876,7 @@
 
               <div className="flex justify-center -my-3 relative z-10">
                 <div className="bg-white p-2 rounded-full border border-slate-200 shadow-sm text-[#D32F2F]">
-                  <LucideIcon name="arrow-down-up" size={16} />
+                  <ArrowDownUp size={16} />
                 </div>
               </div>
 
@@ -860,222 +903,7 @@
       );
     };
 
-    const ShoppingView = () => {
-      const [items, setItems] = useState([]);
-      const [gifts, setGifts] = useState([]);
-      const [desc, setDesc] = useState('');
-      const [amount, setAmount] = useState('');
-      const [giftWho, setGiftWho] = useState('');
-      const [giftItem, setGiftItem] = useState('');
-      const [subTab, setSubTab] = useState('wallet');
-      const [rate, setRate] = useState(0.22);
-
-      useEffect(() => {
-        const savedExp = localStorage.getItem('tohoku_v5_expenses');
-        const savedGift = localStorage.getItem('tohoku_v5_gifts');
-        const savedRate = localStorage.getItem('tohoku_rate');
-        
-        if (savedExp) setItems(JSON.parse(savedExp));
-        if (savedGift) setGifts(JSON.parse(savedGift));
-        if (savedRate) setRate(parseFloat(savedRate));
-      }, []);
-
-      useEffect(() => {
-        localStorage.setItem('tohoku_v5_expenses', JSON.stringify(items));
-      }, [items]);
-      useEffect(() => {
-        localStorage.setItem('tohoku_v5_gifts', JSON.stringify(gifts));
-      }, [gifts]);
-
-      const addExpense = (e) => {
-        e.preventDefault();
-        if (!desc || !amount) return;
-        setItems(prev => [{ id: Date.now(), desc, amount: parseFloat(amount) }, ...prev]);
-        setDesc(''); setAmount('');
-      };
-
-      // Helper to robustly remove item
-      const removeExpense = (id) => {
-        setItems(prevItems => prevItems.filter(item => item.id !== id));
-      };
-
-      const addGift = (e) => {
-        e.preventDefault();
-        if (!giftWho || !giftItem) return;
-        setGifts(prev => [{ id: Date.now(), who: giftWho, item: giftItem, bought: false }, ...prev]);
-        setGiftWho(''); setGiftItem('');
-      };
-
-      const removeGift = (id) => {
-        setGifts(prev => prev.filter(item => item.id !== id));
-      };
-
-      const toggleGift = (id) => {
-        setGifts(prev => prev.map(g => g.id === id ? { ...g, bought: !g.bought } : g));
-      };
-
-      const total = items.reduce((acc, cur) => acc + cur.amount, 0);
-
-      return (
-        <div className="space-y-8 pb-24">
-          <div className="flex justify-center gap-8 mb-8 border-b border-slate-200 pb-1">
-            <button 
-              onClick={() => setSubTab('wallet')}
-              className={`pb-3 text-sm font-bold tracking-widest transition-all ${subTab === 'wallet' ? 'text-[#D32F2F] border-b-2 border-[#D32F2F]' : 'text-slate-400'}`}
-            >
-              記帳本
-            </button>
-            <button 
-              onClick={() => setSubTab('gifts')}
-              className={`pb-3 text-sm font-bold tracking-widest transition-all ${subTab === 'gifts' ? 'text-[#D32F2F] border-b-2 border-[#D32F2F]' : 'text-slate-400'}`}
-            >
-              伴手禮
-            </button>
-          </div>
-
-          {subTab === 'wallet' ? (
-            <div className="animate-fadeIn">
-              <div className="bg-white p-8 rounded-none border-y border-slate-200 mb-8 text-center relative">
-                 <p className="text-[10px] text-slate-400 mb-2 font-bold tracking-[0.2em] uppercase">Total Expenses</p>
-                 <div className="text-5xl font-serif font-bold text-slate-800 tracking-tighter">
-                   <span className="text-2xl mr-2 font-light text-slate-400">¥</span>{total.toLocaleString()}
-                 </div>
-                 <div className="text-sm text-slate-400 mt-1 font-sans">
-                   ≈ NT$ {Math.round(total * rate).toLocaleString()}
-                 </div>
-              </div>
-              
-              <form onSubmit={addExpense} className="flex gap-3 mb-6 px-4">
-                 <input value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Item Name" className="flex-1 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
-                 <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="¥" className="w-24 bg-transparent border-b border-slate-300 py-2 text-sm font-serif focus:outline-none focus:border-[#D32F2F] placeholder:text-slate-300 placeholder:font-sans" />
-                 <button type="submit" className="text-[#D32F2F] hover:bg-red-50 rounded-full w-10 h-10 flex items-center justify-center transition-colors"><LucideIcon name="plus" size={24}/></button>
-              </form>
-
-              <div className="space-y-0 px-4">
-                {items.map(i => (
-                  <div key={i.id} className="bg-white py-4 border-b border-slate-100 flex justify-between items-center">
-                    <span className="text-slate-700 font-serif font-medium text-lg">{i.desc}</span>
-                    <div className="flex items-center gap-3">
-                      <div className="flex flex-col items-end mr-2">
-                        <span className="font-serif font-bold text-slate-800 text-lg">¥ {i.amount.toLocaleString()}</span>
-                        <span className="text-[10px] text-slate-400 font-sans">≈ NT$ {Math.round(i.amount * rate).toLocaleString()}</span>
-                      </div>
-                      {/* Improved Delete Button */}
-                      <button 
-                        type="button" 
-                        className="text-slate-300 hover:text-[#D32F2F] transition-colors p-2 -mr-2" 
-                        onClick={() => removeExpense(i.id)}
-                        aria-label="Delete"
-                      >
-                        <LucideIcon name="trash-2" size={20}/>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {items.length === 0 && <div className="text-center text-slate-300 py-12 text-sm font-serif italic">No expenses recorded yet.</div>}
-              </div>
-            </div>
-          ) : (
-            <div className="animate-fadeIn px-4">
-               <form onSubmit={addGift} className="bg-white p-6 rounded-xl border border-slate-200 mb-6 shadow-sm">
-                 <div className="flex flex-col gap-4">
-                   <input value={giftWho} onChange={e=>setGiftWho(e.target.value)} placeholder="For Whom? (e.g., Boss)" className="bg-slate-50 rounded px-4 py-3 text-sm font-serif focus:outline-none focus:ring-1 focus:ring-[#D32F2F]" />
-                   <div className="flex gap-3">
-                     <input value={giftItem} onChange={e=>setGiftItem(e.target.value)} placeholder="What to buy?" className="flex-1 bg-slate-50 rounded px-4 py-3 text-sm font-serif focus:outline-none focus:ring-1 focus:ring-[#D32F2F]" />
-                     <button type="submit" className="bg-[#D32F2F] text-white rounded px-6 text-sm font-bold tracking-wider hover:bg-red-700 transition-colors">ADD</button>
-                   </div>
-                 </div>
-               </form>
-
-               <div className="space-y-3">
-                 {gifts.map(g => (
-                   <div key={g.id} onClick={() => toggleGift(g.id)} className={`p-5 rounded-lg border cursor-pointer transition-all flex items-center gap-4 ${g.bought ? 'bg-slate-50 border-transparent opacity-60' : 'bg-white border-slate-200 shadow-sm hover:border-[#D32F2F]'}`}>
-                     <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${g.bought ? 'bg-[#D32F2F] border-[#D32F2F]' : 'border-slate-300'}`}>
-                       {g.bought && <LucideIcon name="check-square" size={14} className="text-white" />}
-                     </div>
-                     <div className="flex-1">
-                       <div className={`font-serif font-bold text-lg ${g.bought ? 'line-through text-slate-400' : 'text-slate-800'}`}>{g.who}</div>
-                       <div className="text-sm text-slate-500 font-serif italic">{g.item}</div>
-                     </div>
-                     <button onClick={() => removeGift(g.id)} className="text-slate-300 hover:text-[#D32F2F] p-2"><LucideIcon name="trash-2" size={18}/></button>
-                   </div>
-                 ))}
-                 {gifts.length === 0 && <div className="text-center text-slate-300 py-12 text-sm font-serif italic">List is empty.</div>}
-               </div>
-            </div>
-          )}
-        </div>
-      );
-    };
-
-    const CheckListSection = ({ title, color, listKey }) => {
-      const [items, setItems] = useState([]);
-      const [newItem, setNewItem] = useState(''); // State for new item input
-      const defaultItems = listKey === 'carryon' 
-        ? ["發熱衣", "防風外套", "圍巾/手套", "毛帽", "防滑靴", "護唇膏", "行動電源"]
-        : ["常備藥", "乳液", "牙刷牙膏", "轉接頭", "充電器", "壓縮袋", "大購物袋"];
-
-      useEffect(() => {
-        const saved = localStorage.getItem(`tohoku_v6_${listKey}`); // V6 storage key
-        if (saved) setItems(JSON.parse(saved));
-        else setItems(defaultItems.map((txt, i) => ({ id: i, text: txt, checked: false })));
-      }, []);
-
-      const updateStorage = (newItems) => {
-        setItems(newItems);
-        localStorage.setItem(`tohoku_v6_${listKey}`, JSON.stringify(newItems));
-      };
-
-      const toggle = (id) => {
-        const newItems = items.map(i => i.id === id ? { ...i, checked: !i.checked } : i);
-        updateStorage(newItems);
-      };
-
-      const addItem = (e) => {
-        e.preventDefault();
-        if (!newItem.trim()) return;
-        const newEntry = { id: Date.now(), text: newItem, checked: false };
-        updateStorage([...items, newEntry]);
-        setNewItem('');
-      };
-
-      const removeItem = (id) => {
-        updateStorage(items.filter(i => i.id !== id));
-      };
-
-      return (
-        <div className="bg-white p-6 rounded-none border border-slate-200">
-          <h3 className={`font-serif font-bold mb-4 tracking-wider flex items-center gap-2 ${color === 'rose' ? 'text-[#D32F2F]' : 'text-emerald-700'}`}>
-            <div className={`w-2 h-2 rounded-full ${color === 'rose' ? 'bg-[#D32F2F]' : 'bg-emerald-700'}`}></div>
-            {title}
-          </h3>
-          
-          <div className="space-y-3 mb-4">
-            {items.map(item => (
-              <div key={item.id} className="flex items-center gap-3 group">
-                <div onClick={() => toggle(item.id)} className={`w-5 h-5 border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${item.checked ? (color==='rose'?'bg-[#D32F2F] border-[#D32F2F]':'bg-emerald-700 border-emerald-700') : 'border-slate-300 group-hover:border-slate-400'}`}>
-                  {item.checked && <LucideIcon name="check-square" size={12} className="text-white"/>}
-                </div>
-                <span onClick={() => toggle(item.id)} className={`flex-1 text-sm font-serif cursor-pointer ${item.checked ? 'text-slate-300 line-through decoration-slate-300' : 'text-slate-700'}`}>{item.text}</span>
-                <button onClick={() => removeItem(item.id)} className="text-slate-200 hover:text-red-400 p-2"><LucideIcon name="x" size={16} /></button>
-              </div>
-            ))}
-          </div>
-
-          <form onSubmit={addItem} className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
-            <input 
-              type="text" 
-              value={newItem} 
-              onChange={(e) => setNewItem(e.target.value)} 
-              placeholder="新增項目..." 
-              className="flex-1 bg-slate-50 border border-slate-200 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-slate-400"
-            />
-            <button type="submit" className="text-slate-400 hover:text-[#D32F2F]"><LucideIcon name="plus" size={20} /></button>
-          </form>
-        </div>
-      )
-    }
-
+    // Tools View
     const ToolsView = () => {
       const [activeTool, setActiveTool] = useState('phrase');
 
@@ -1088,7 +916,6 @@
         { jp: "免税できますか", en: "Men-zei De-ki-ma-su-ka", ch: "可以退稅嗎？" },
       ];
 
-      // Expanded Phrase List for "Eat" category (example)
       const eatPhrases = [
         { jp: "お水ください", en: "O-mi-zu Ku-da-sai", ch: "請給我水" },
         { jp: "お会計お願いします", en: "O-kai-kei O-ne-gai", ch: "麻煩結帳" },
@@ -1099,10 +926,10 @@
       return (
         <div className="pb-24">
            <div className="flex justify-center gap-2 mb-8 px-4 overflow-x-auto pb-2 scrollbar-hide">
-             <button onClick={()=>setActiveTool('phrase')} className={`tool-tab ${activeTool==='phrase'?'active':''}`}><LucideIcon name="message-circle" size={16}/> 指指通</button>
-             <button onClick={()=>setActiveTool('pack')} className={`tool-tab ${activeTool==='pack'?'active':''}`}><LucideIcon name="check-square" size={16}/> 清單</button>
-             <button onClick={()=>setActiveTool('rate')} className={`tool-tab ${activeTool==='rate'?'active':''}`}><LucideIcon name="coins" size={16}/> 匯率</button>
-             <button onClick={()=>setActiveTool('info')} className={`tool-tab ${activeTool==='info'?'active':''}`}><LucideIcon name="info" size={16}/> 資訊</button>
+             <button onClick={()=>setActiveTool('phrase')} className={`tool-tab ${activeTool==='phrase'?'active':''}`}><MessageCircle size={16}/> 指指通</button>
+             <button onClick={()=>setActiveTool('pack')} className={`tool-tab ${activeTool==='pack'?'active':''}`}><CheckSquare size={16}/> 清單</button>
+             <button onClick={()=>setActiveTool('rate')} className={`tool-tab ${activeTool==='rate'?'active':''}`}><Coins size={16}/> 匯率</button>
+             <button onClick={()=>setActiveTool('info')} className={`tool-tab ${activeTool==='info'?'active':''}`}><Info size={16}/> 資訊</button>
            </div>
 
            {activeTool === 'phrase' && (
@@ -1169,6 +996,7 @@
       )
     };
 
+    // --- 6. App Component ---
     const NavBtn = ({ icon, label, active, onClick }) => (
       <button onClick={onClick} className={`flex flex-col items-center gap-1 w-16 transition-all duration-300 ${active ? 'text-[#D32F2F]' : 'text-slate-300'}`}>
         <div className={`p-1 transition-all ${active ? '-translate-y-1' : ''}`}>
